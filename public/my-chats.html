@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VOXELLA Chats</title>
+<link rel="stylesheet" href="css/dashboard.css">
+</head>
+
+<body>
+
+<div class="backgroundGlow"></div>
+
+<div class="dashboard">
+
+    <div class="topBar">
+        <div>
+            <h2>My Chats</h2>
+            <p>Click a friend to start chatting.</p>
+        </div>
+        <button id="backBtn" class="secondary">Back</button>
+        <button id="createGroupBtn" class="primary">Create Group</button>
+    </div>
+
+    <div class="chatSearchWrap">
+        <span aria-hidden="true">⌕</span>
+        <input id="chatFilter" type="search" placeholder="Search chats by name, @username, or message" autocomplete="off">
+    </div>
+
+    <div class="cards" id="chatList"></div>
+
+</div>
+
+<script src="js/appearance.js"></script>
+<script src="js/my-chats.js"></script>
+
+</body>
+
+</html>

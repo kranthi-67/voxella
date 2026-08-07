@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VOXELLA Friends</title>
+<link rel="stylesheet" href="css/dashboard.css">
+</head>
+
+<body>
+
+<div class="backgroundGlow"></div>
+
+<div class="dashboard">
+
+    <div class="topBar">
+        <div>
+            <h2>Find Friends</h2>
+            <p>Search people, add friends, and visit profiles.</p>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center;">
+            <button id="blockedBtn" class="secondary">See blocked users</button>
+            <button id="backBtn" class="secondary">Back</button>
+        </div>
+    </div>
+
+    <div class="card searchCard">
+        <div class="searchField">
+            <input id="friendSearch" type="text" placeholder="Search by username or display name" autocomplete="off">
+            <button id="searchBtn">Search</button>
+        </div>
+    </div>
+
+    <div class="cards" id="resultsGrid"></div>
+
+</div>
+
+<script src="js/friends.js"></script>
+
+</body>
+
+</html>

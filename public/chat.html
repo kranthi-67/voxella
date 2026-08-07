@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>VOXELLA Chat</title>
+
+<link rel="stylesheet" href="css/chat.css">
+
+</head>
+
+<body>
+
+<div class="chatContainer">
+
+    <div class="topBar">
+
+        <div class="chatTitle"><span class="chatMark">✦</span><div><p>LIVE CONVERSATION</p><h2>Random Chat</h2></div></div>
+
+        <div>
+
+            <button id="skipBtn" class="quietBtn">Skip</button>
+
+            <button id="leaveBtn" class="leaveBtn">Leave</button>
+
+        </div>
+
+    </div>
+
+    <div id="status" role="status" aria-live="polite">
+
+        Searching for someone...
+
+    </div>
+    <div id="typingStatus" class="typingStatus" aria-live="polite"></div>
+
+    <div class="chatActions" id="chatActions">
+        <input id="chatSearch" type="search" placeholder="Search messages" aria-label="Search messages">
+        <button id="attachImageBtn" class="secondary">Image</button>
+        <button id="recordAudioBtn" class="secondary">Voice Note</button>
+        <button id="startCallBtn" class="secondary">Voice Call</button>
+    </div>
+
+    <div id="messages"></div>
+
+    <div class="inputArea">
+
+        <input
+            id="messageInput"
+            type="text"
+            maxlength="1000"
+            placeholder="Write a message...">
+
+        <span id="messageCount" class="messageCount">0 / 1000</span>
+
+        <button id="sendBtn">
+
+            Send <span aria-hidden="true">↑</span>
+
+        </button>
+
+    </div>
+
+    <input type="file" id="imageInput" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+    <audio id="remoteAudio" autoplay hidden></audio>
+
+</div>
+
+<script src="js/appearance.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="js/chat.js"></script>
+
+</body>
+
+</html>

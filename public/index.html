@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VOXELLA • Build Communities. Chat Freely.</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- SPLASH -->
+    <div id="splash">
+        <img src="assets/logo.png" class="splashLogo">
+        <h1>VOXELLA</h1>
+        <p id="loadingText">
+            Initializing...
+        </p>
+        <div class="progress">
+            <div id="progressBar"></div>
+        </div>
+    </div>
+
+    <!-- LANDING -->
+    <div id="mainContent">
+        <div class="backgroundGlow"></div>
+        
+        <div class="landing">
+            <img src="assets/logo.png" class="logo">
+            <h1>VOXELLA</h1>
+            <p class="tagline">
+                Build Communities. Chat Freely.
+            </p>
+            <p class="description">
+                Meet new people, build friendships and communities in a private and secure environment.
+            </p>
+
+            <div class="buttons">
+                <!-- Removed the "/" so it looks in the same folder instead of the C: drive root -->
+                <button class="primary" onclick="window.location.href='signup.html'">
+                    Create Account
+                </button>
+                <button class="secondary" onclick="window.location.href='login.html'">
+                    Login
+                </button>
+                <button class="guest" onclick="window.location.href='dashboard.html'">
+                    Continue as Guest
+                </button>
+            </div>
+        </div>
+
+        <div class="footer">
+            © 2026 VOXELLA
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+
+</body>
+</html>

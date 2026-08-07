@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>VOXELLA Dashboard</title>
+
+<link rel="stylesheet" href="css/dashboard.css">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="backgroundGlow"></div>
+
+<div class="dashboard">
+
+<div class="topBar">
+
+<div>
+
+<p class="eyebrow">VOXELLA / HOME</p>
+<h2>Welcome back <span aria-hidden="true">👋</span></h2>
+
+<p>Ready to meet new people?</p>
+
+</div>
+
+<div style="display:flex;align-items:center;gap:15px;">
+
+<a id="profileLink" class="profileLink" href="profile.html" aria-label="Open your profile">View profile <span aria-hidden="true">→</span></a>
+
+<div class="profileArea">
+
+<img
+id="userAvatar"
+class="profilePic"
+src="assets/defaultavatar.png"
+alt="Avatar">
+
+<div class="userInfo">
+
+<h3 id="displayName">Loading...</h3>
+
+<p id="username">@loading</p>
+
+<span id="statusBadge">🟢 Online</span>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="cards">
+
+<div class="card profileCard" id="profileCard">
+
+    <div class="profileBanner" id="profileBanner"></div>
+
+    <div class="profileContent">
+
+        <img id="cardAvatar" class="cardAvatar" src="assets/defaultavatar.png" alt="Avatar">
+
+        <div class="profileCopy">
+            <p class="cardLabel">YOUR SPACE</p>
+            <h2 id="cardDisplayName">Loading...</h2>
+            <p id="cardUsername">@loading</p>
+            <p id="cardBio">No bio yet.</p>
+        </div>
+
+        <button id="editProfile">Edit Profile <span aria-hidden="true">→</span></button>
+
+    </div>
+
+</div>
+
+<div class="card" id="randomChat">
+
+<h2>🎲 Random Chat</h2>
+
+<p>Get matched instantly with a stranger.</p>
+
+</div>
+
+<div class="card" id="groupChat">
+
+<h2>👥 Random Group Chat</h2>
+
+<p>Join a room with random people.</p>
+
+</div>
+
+<div class="card" id="friendsCard">
+
+<h2>🔎 Find Friends</h2>
+
+<p>Search people, add friends, and view profiles.</p>
+
+</div>
+
+<div class="card" id="myChats">
+
+<h2>💬 My Chats</h2>
+
+<p>Continue previous conversations.</p>
+
+</div>
+
+<div class="card logout">
+
+    <h2>🚪 Logout</h2>
+
+    <p>Sign out safely.</p>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- ===========================
+About VOXELLA
+=========================== -->
+
+<div id="aboutModal" class="aboutModal">
+
+<div class="aboutContent">
+
+<span id="closeAbout">&times;</span>
+
+<h2>👋 About VOXELLA</h2>
+
+<p><strong>Hi! I'm Kranti.</strong></p>
+
+<p>
+
+This is my first website ever, developed with lots of curiosity,
+late-night coding sessions, and with the help of ChatGPT.
+
+I really hope y'all enjoy using VOXELLA. ❤️
+
+This is version 1.0, and I plan to add more features in the futures, more themes😋✌️.
+</p>
+
+<p>
+
+If anyone wants to contact me or donate to support the project:
+
+</p>
+
+<p>
+
+<strong>gmail:</strong> @userwithredcat@gmail.com
+
+</p>
+
+<hr>
+
+<p>
+
+Thank you so much for visiting VOXELLA! :3
+
+</p>
+
+</div>
+
+</div>
+
+<script src="js/appearance.js"></script>
+<script src="js/statusUtils.js"></script>
+<script src="js/dashboard.js"></script>
+
+</body>
+
+</html>

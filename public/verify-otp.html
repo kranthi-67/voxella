@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify OTP • VOXELLA</title>
+
+    <link rel="stylesheet" href="css/signup.css">
+</head>
+<body>
+
+<div class="backgroundGlow"></div>
+
+<div class="signupCard">
+
+    <img src="assets/logo.png" class="logo">
+
+    <h1>Verify OTP</h1>
+
+    <p class="subtitle">
+        Enter the 6-digit code sent to your email.
+    </p>
+
+    <form id="otpForm">
+
+        <label>OTP</label>
+
+        <input
+            type="text"
+            id="otp"
+            maxlength="6"
+            placeholder="123456"
+            required>
+
+        <div id="error"></div>
+
+        <button type="submit">
+            Verify OTP
+        </button>
+
+    </form>
+
+</div>
+
+<script src="js/verifyOtp.js"></script>
+
+</body>
+</html>

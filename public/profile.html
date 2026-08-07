@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>VOXELLA Profile</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="css/profile.css">
+
+</head>
+
+<body>
+
+<div class="pageGlow"></div>
+
+<div id="profileCard">
+
+    <div id="banner">
+
+        <img id="bannerImage" alt="">
+
+        <div id="bannerFade"></div>
+
+        <button class="quickEditBtn" id="quickEditBanner" type="button" aria-label="Change banner">
+            <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83zM3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/></svg>
+        </button>
+
+    </div>
+
+    <!-- animated theme layer, sits behind the profile content -->
+    <div id="backgroundLayer"></div>
+
+    <div class="profileContent">
+
+        <div id="avatarRing">
+
+            <img id="avatar" alt="">
+
+            <button class="quickEditBtn avatarEditBtn" id="quickEditAvatar" type="button" aria-label="Change avatar">
+                <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83zM3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/></svg>
+            </button>
+
+        </div>
+
+        <h2 id="displayName">Loading...</h2>
+
+        <p id="username">@username</p>
+
+        <p id="pronouns"></p>
+
+        <div id="status"></div>
+
+        <div class="profileStats" id="profileStats">
+            <span id="themeBadge"></span>
+            <span id="joinedAt"></span>
+        </div>
+
+        <p id="bio"></p>
+
+        <div class="profileActions" id="profileActions">
+            <button id="editProfile" type="button">Edit Profile</button>
+            <button id="messageProfile" type="button" class="secondary">Send Message</button>
+            <button id="friendToggle" type="button" class="secondary">Add Friend</button>
+            <button id="blockProfile" type="button" class="secondary">Block</button>
+            <button id="reportProfile" type="button" class="secondary">Report</button>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ===================== Edit Profile Panel ===================== -->
+
+<div id="editOverlay">
+
+    <div id="editPanel" role="dialog" aria-modal="true" aria-labelledby="editPanelTitle">
+
+        <div class="editPanelHeader">
+
+            <h3 id="editPanelTitle">Edit Profile</h3>
+            <button id="closeEdit" type="button" aria-label="Close">&times;</button>
+
+        </div>
+
+        <div class="editPanelBody">
+
+            <!-- Banner picker — upload/remove act immediately -->
+            <div class="pickerBlock">
+
+                <span class="pickerLabel">Banner</span>
+
+                <div class="bannerPreviewWrap">
+                    <img id="bannerPreview" alt="Banner preview">
+                </div>
+
+                <div class="pickerActions">
+                    <button class="pickerBtn upload" data-target="banner" type="button">Upload image</button>
+                    <button class="pickerBtn remove" data-target="banner" type="button">Remove</button>
+                    <input type="file" id="bannerFileInput" accept="image/*" hidden>
+                </div>
+
+            </div>
+
+            <!-- Background picker — upload/remove act immediately -->
+            <div class="pickerBlock">
+
+                <span class="pickerLabel">Background</span>
+
+                <div class="bannerPreviewWrap">
+                    <img id="backgroundPreview" alt="Background preview">
+                </div>
+
+                <div class="pickerActions">
+                    <button class="pickerBtn upload" data-target="background" type="button">Upload background</button>
+                    <button class="pickerBtn remove" data-target="background" type="button">Remove</button>
+                    <input type="file" id="backgroundFileInput" accept="image/*" hidden>
+                </div>
+
+            </div>
+
+            <!-- Avatar picker — upload/remove act immediately -->
+            <div class="pickerBlock">
+
+                <span class="pickerLabel">Profile Picture</span>
+
+                <div class="avatarPreviewWrap">
+                    <img id="avatarPreview" alt="Avatar preview">
+                </div>
+
+                <div class="pickerActions">
+                    <button class="pickerBtn upload" data-target="avatar" type="button">Upload image</button>
+                    <button class="pickerBtn remove" data-target="avatar" type="button">Remove</button>
+                    <input type="file" id="avatarFileInput" accept="image/*" hidden>
+                </div>
+
+            </div>
+
+            <div class="fieldDivider"></div>
+
+            <!-- displayName/username: not editable yet — your backend
+                 update route doesn't accept them. Shown read-only. -->
+
+            <label class="fieldLabel" for="inputDisplayName">Display name</label>
+            <input class="fieldInput" id="inputDisplayName" type="text" maxlength="40" required>
+
+            <label class="fieldLabel" for="inputUsername">Username</label>
+            <input class="fieldInput" id="inputUsername" type="text" disabled>
+
+            <label class="fieldLabel" for="inputPronouns">Pronouns</label>
+            <input class="fieldInput" id="inputPronouns" type="text" maxlength="20" placeholder="e.g. she/her">
+
+            <label class="fieldLabel" for="inputStatus">Status</label>
+            <select class="fieldInput" id="inputStatus">
+                <option value="Online">Online</option>
+                <option value="Idle">Idle</option>
+                <option value="DND">Do Not Disturb</option>
+                <option value="Invisible">Invisible</option>
+                <option value="Gaming">Gaming</option>
+                <option value="Chill">Chill</option>
+            </select>
+
+            <label class="fieldLabel" for="inputStatusNote">Status note</label>
+            <input class="fieldInput" id="inputStatusNote" type="text" maxlength="120" placeholder="What are you up to?">
+
+            <label class="fieldLabel" for="inputStatusNoteDuration">Keep note for</label>
+            <select class="fieldInput" id="inputStatusNoteDuration">
+                <option value="24h">24 hours</option>
+                <option value="3d">3 days</option>
+            </select>
+
+            <label class="fieldLabel" for="inputTheme">Theme</label>
+            <select class="fieldInput" id="inputTheme">
+                <option value="Crimson">Crimson</option>
+                <option value="Galaxy">Galaxy</option>
+                <option value="Ocean">Ocean</option>
+                <option value="Forest">Forest</option>
+                <option value="Sunset">Sunset</option>
+                <option value="Amoled">Amoled Black</option>
+                <option value="Glass">Glass</option>
+                <option value="Midnight">Midnight</option>
+                <option value="Nebula">Nebula</option>
+                <option value="Aurora">Aurora</option>
+                <option value="Pixel">Pixel</option>
+                <option value="Synthwave">Synthwave</option>
+                <option value="Matrix">Matrix</option>
+                <option value="Candy">Candy</option>
+                <option value="Solar">Solar</option>
+                <option value="Frost">Frost</option>
+                <option value="Cyber">Cyber</option>
+                <option value="Sakura">Sakura</option>
+                <option value="Volcano">Volcano</option>
+                <option value="Monsoon">Monsoon</option>
+                <option value="Ember">Ember</option>
+                <option value="Prism">Prism</option>
+                <option value="Neon Arena">Neon Arena</option>
+                <option value="Phantom">Phantom</option>
+                <option value="Kawaii">Kawaii</option>
+                <option value="Shonen">Shonen</option>
+                <option value="Mecha">Mecha</option>
+            </select>
+
+            <div class="themeGallery" id="themeGallery" aria-label="Choose a profile theme"></div>
+
+            <label class="fieldLabel" for="inputAura">Aura</label>
+            <select class="fieldInput" id="inputAura">
+                <option>Crimson</option><option>Rose</option><option>Amber</option><option>Gold</option><option>Emerald</option><option>Ocean</option><option>Sky</option><option>Violet</option><option>Neon</option><option>Ghost</option>
+            </select>
+
+            <label class="fieldLabel" for="inputAppearance">App appearance</label>
+            <div class="appearanceChoices" id="appearanceChoices">
+                <button type="button" class="appearanceChoice" data-appearance="dark">Dark</button>
+                <button type="button" class="appearanceChoice light" data-appearance="white">White</button>
+            </div>
+            <select class="fieldInput" id="inputAppearance" hidden>
+                <option value="dark">Dark (default)</option>
+                <option value="white">White</option>
+            </select>
+
+            <label class="fieldLabel" for="inputBio">Bio</label>
+            <textarea class="fieldInput" id="inputBio" maxlength="150" rows="4" placeholder="Tell people about yourself"></textarea>
+
+        </div>
+
+        <div class="editPanelFooter">
+            <button id="cancelEdit" type="button" class="footerBtn ghost">Cancel</button>
+            <button id="saveEdit" type="button" class="footerBtn primary">Save changes</button>
+        </div>
+
+    </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script src="js/appearance.js"></script>
+<script src="js/statusUtils.js"></script>
+<script src="js/profile.js"></script>
+
+</body>
+
+</html>
