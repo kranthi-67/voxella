@@ -5,15 +5,27 @@ const messages = document.getElementById("messages");
 const input = document.getElementById("messageInput");
 const sendBtn = document.getElementById("sendBtn");
 const attachImageBtn = document.getElementById("attachImageBtn");
+const gifBtn = document.getElementById("gifBtn");
+const attachVideoBtn = document.getElementById("attachVideoBtn");
 const recordAudioBtn = document.getElementById("recordAudioBtn");
 const startCallBtn = document.getElementById("startCallBtn");
 const imageInput = document.getElementById("imageInput");
+const videoInput = document.getElementById("videoInput");
 const remoteAudio = document.getElementById("remoteAudio");
 const skipBtn = document.getElementById("skipBtn");
 const leaveBtn = document.getElementById("leaveBtn");
 const messageCount = document.getElementById("messageCount");
 const chatSearch = document.getElementById("chatSearch");
 const typingStatus = document.getElementById("typingStatus");
+const mediaViewer = document.getElementById("mediaViewer");
+const viewerImage = document.getElementById("viewerImage");
+const closeMediaViewer = document.getElementById("closeMediaViewer");
+const gifPicker = document.getElementById("gifPicker");
+const closeGifPicker = document.getElementById("closeGifPicker");
+const gifSearchForm = document.getElementById("gifSearchForm");
+const gifSearchInput = document.getElementById("gifSearchInput");
+const gifResults = document.getElementById("gifResults");
+const gifStatus = document.getElementById("gifStatus");
 const title = document.querySelector(".topBar h2");
 const params = new URLSearchParams(window.location.search);
 const currentUser = localStorage.getItem("username") || sessionStorage.getItem("username");
@@ -79,14 +91,17 @@ async function loadParticipantAvatars(participants) {
 }
 
 function renderChatControls() {
-  const isPrivate = chatType === "private";
+  const isPrivate = chatType === "private" || chatType === "group";
   attachImageBtn.style.display = isPrivate ? "inline-flex" : "none";
+  gifBtn.style.display = isPrivate ? "inline-flex" : "none";
+  attachVideoBtn.style.display = isPrivate ? "inline-flex" : "none";
   recordAudioBtn.style.display = isPrivate ? "inline-flex" : "none";
   startCallBtn.style.display = isPrivate ? "inline-flex" : "none";
 }
 
 function setMediaBusy(isBusy) {
   attachImageBtn.disabled = isBusy;
+  attachVideoBtn.disabled = isBusy;
   recordAudioBtn.disabled = isBusy;
 }
 
@@ -99,6 +114,42 @@ function filterMessages() {
   messages.querySelectorAll(".messageRow").forEach((row) => {
     row.hidden = !!query && !row.textContent.toLowerCase().includes(query);
   });
+}
+
+function updateReactionView(messageId, reactions) {
+  const row = messages.querySelector(`[data-message-id="${CSS.escape(messageId)}"]`);
+  const tray = row?.querySelector(".reactionTray");
+  if (!tray) return;
+  tray.replaceChildren();
+  (reactions || []).forEach((reaction) => {
+    const button = document.createElement("button"); button.className = `reactionPill${reaction.users.includes(currentUser) ? " selected" : ""}`;
+    button.textContent = `${reaction.emoji} ${reaction.users.length}`;
+    button.onclick = () => toggleReaction(messageId, reaction.emoji);
+    tray.appendChild(button);
+  });
+}
+
+async function toggleReaction(messageId, emoji) {
+  const response = await fetch(`/api/chat/${encodeURIComponent(activeChatId)}/message/${encodeURIComponent(messageId)}/reaction`, { method: "POST", headers: authHeaders, body: JSON.stringify({ emoji }) });
+  const data = await response.json();
+  if (!data.success) return alert(data.message || "Unable to react.");
+  updateReactionView(messageId, data.reactions);
+  socket.emit("messageReaction", { roomId: roomName, messageId, reactions: data.reactions });
+}
+
+async function sendGif(mediaUrl) {
+  const response = await fetch(`/api/chat/${encodeURIComponent(activeChatId)}/gif`, { method: "POST", headers: authHeaders, body: JSON.stringify({ mediaUrl }) });
+  const data = await response.json();
+  if (!data.success) throw new Error(data.message || "GIF could not be sent.");
+  appendMessage(data.message); socket.emit("sendMessage", { roomId: roomName, message: data.message }); gifPicker.close();
+}
+
+async function searchGifs(query) {
+  gifResults.replaceChildren(); gifStatus.textContent = "Searching Tenor…";
+  const data = await fetch(`/api/gifs/search?q=${encodeURIComponent(query)}`).then((response) => response.json());
+  if (!data.success) { gifStatus.textContent = data.message || "GIF search is unavailable."; return; }
+  gifStatus.textContent = data.results.length ? "Choose a GIF" : "No GIFs found.";
+  data.results.forEach((gif) => { const button = document.createElement("button"); const image = document.createElement("img"); image.src = gif.preview; image.alt = "GIF result"; button.appendChild(image); button.onclick = async () => { try { await sendGif(gif.url); } catch (error) { alert(error.message); } }; gifResults.appendChild(button); });
 }
 
 function appendMessage(payload) {
@@ -130,8 +181,14 @@ function appendMessage(payload) {
     image.src = mediaUrl;
     image.alt = "Shared image";
     image.className = "chatImage";
+    image.onclick = () => { viewerImage.src = mediaUrl; mediaViewer.showModal(); };
     image.onerror = () => { image.replaceWith(Object.assign(document.createElement("p"), { className: "mediaError", textContent: "This image is no longer available." })); };
     content.appendChild(image);
+  } else if (payload.type === "video" && mediaUrl) {
+    const video = document.createElement("video");
+    video.controls = true; video.preload = "metadata"; video.src = mediaUrl; video.className = "chatVideo";
+    video.onclick = () => { if (video.paused) video.play(); };
+    content.appendChild(video);
   } else if (payload.type === "voice" && mediaUrl) {
     const audio = document.createElement("audio");
     audio.controls = true;
@@ -197,6 +254,15 @@ function appendMessage(payload) {
     };
     actions.appendChild(replyBtn);
 
+    const reactBtn = document.createElement("button");
+    reactBtn.type = "button"; reactBtn.className = "actionBtn"; reactBtn.textContent = "React";
+    reactBtn.onclick = () => {
+      const chooser = document.createElement("div"); chooser.className = "reactionChooser";
+      ["👍", "❤️", "😂", "😮", "😢"].forEach((emoji) => { const choice = document.createElement("button"); choice.textContent = emoji; choice.onclick = () => { toggleReaction(payload.messageId, emoji); chooser.remove(); }; chooser.appendChild(choice); });
+      actions.appendChild(chooser); setTimeout(() => chooser.remove(), 5000);
+    };
+    actions.appendChild(reactBtn);
+
     if (payload.type === "image" && mediaUrl) {
       const saveBtn = document.createElement("button");
       saveBtn.type = "button";
@@ -221,8 +287,14 @@ function appendMessage(payload) {
     }
   }
 
+  if (kind !== "system") {
+    const tray = document.createElement("div"); tray.className = "reactionTray"; content.appendChild(tray);
+    updateReactionView(payload.messageId, payload.reactions || []);
+  }
+
   row.appendChild(content);
   messages.appendChild(row);
+  if (kind !== "system") updateReactionView(payload.messageId, payload.reactions || []);
   messages.scrollTop = messages.scrollHeight;
 }
 
@@ -407,6 +479,8 @@ sendBtn.addEventListener("click", async () => {
 });
 
 attachImageBtn.addEventListener("click", () => imageInput.click());
+gifBtn.addEventListener("click", () => { gifPicker.showModal(); gifSearchInput.focus(); });
+attachVideoBtn.addEventListener("click", () => videoInput.click());
 imageInput.addEventListener("change", async () => {
   const file = imageInput.files[0];
   imageInput.value = "";
@@ -423,6 +497,14 @@ imageInput.addEventListener("change", async () => {
     socket.emit("sendMessage", { roomId: roomName, message: result.message });
     status.textContent = "Image sent";
   } catch (error) { alert(error.message); } finally { setMediaBusy(false); }
+});
+socket.on("messageReaction", ({ messageId, reactions }) => updateReactionView(messageId, reactions));
+
+videoInput.addEventListener("change", async () => {
+  const file = videoInput.files[0]; videoInput.value = "";
+  if (!file || !activeChatId) return;
+  if (!/^video\/(mp4|webm)$/.test(file.type)) return alert("Choose an MP4 or WEBM video.");
+  try { setMediaBusy(true); status.textContent = "Uploading video…"; const result = await uploadChatMedia(file, "video"); if (!result.success) throw new Error(result.message || "Video upload failed."); appendMessage(result.message); socket.emit("sendMessage", { roomId: roomName, message: result.message }); status.textContent = "Video sent"; } catch (error) { alert(error.message); } finally { setMediaBusy(false); }
 });
 
 recordAudioBtn.addEventListener("click", async () => {
@@ -462,6 +544,10 @@ input.addEventListener("input", () => {
   typingTimer = setTimeout(() => { socket.emit("typing", { roomId: roomName, isTyping: false }); typingSent = false; }, 900);
 });
 chatSearch.addEventListener("input", filterMessages);
+closeMediaViewer.addEventListener("click", () => mediaViewer.close());
+mediaViewer.addEventListener("click", (event) => { if (event.target === mediaViewer) mediaViewer.close(); });
+closeGifPicker.addEventListener("click", () => gifPicker.close());
+gifSearchForm.addEventListener("submit", (event) => { event.preventDefault(); searchGifs(gifSearchInput.value.trim()); });
 updateMessageCount();
 skipBtn.onclick = () => window.location.reload();
 leaveBtn.onclick = () => window.location.href = "dashboard.html";

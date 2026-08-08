@@ -13,7 +13,7 @@ const messageSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ["text", "image", "voice", "system"],
+        enum: ["text", "image", "video", "voice", "system"],
         default: "text"
     },
     text: {
@@ -29,6 +29,12 @@ const messageSchema = new mongoose.Schema({
         type: [String],
         default: []
     },
+    readBy: { type: [String], default: [] },
+    reactions: [{
+        emoji: { type: String, required: true },
+        users: { type: [String], default: [] },
+        _id: false
+    }],
     createdAt: {
         type: Date,
         default: Date.now

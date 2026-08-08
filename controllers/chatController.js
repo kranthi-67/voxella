@@ -7,8 +7,9 @@ const createAttachmentMessage = async (chat, username, messageData) => {
     messageId: new mongoose.Types.ObjectId().toString(),
     sender: username,
     type: messageData.type,
-    text: messageData.text || (messageData.type === "image" ? "Sent an image." : "Sent a voice note."),
-    mediaUrl: messageData.mediaUrl || ""
+    text: messageData.text || (messageData.type === "image" ? "Sent an image." : messageData.type === "video" ? "Sent a video." : "Sent a voice note."),
+    mediaUrl: messageData.mediaUrl || "",
+    readBy: [username]
   };
   chat.messages.push(message);
   chat.lastMessage = {
@@ -26,23 +27,25 @@ const getUserChats = async (req, res) => {
     const self = await User.findOne({ username }).select("friends");
     if (!self) return res.status(404).json({ success: false, message: "User not found." });
 
-    const chats = await Chat.find({ participants: username, type: "private" })
+    const chats = await Chat.find({ participants: username, type: { $in: ["private", "group"] } })
       .sort({ updatedAt: -1 })
-      .select("_id type title participants lastMessage updatedAt");
+      .select("_id type title participants messages.sender messages.readBy lastMessage updatedAt");
 
     const friendChats = chats.filter((chat) => {
+      if (chat.type === "group") return true;
       const other = chat.participants.find((participant) => participant !== username);
       return other && self.friends.includes(other);
     });
-    const friendUsernames = friendChats.map((chat) => chat.participants.find((participant) => participant !== username));
+    const friendUsernames = friendChats.filter((chat) => chat.type === "private").map((chat) => chat.participants.find((participant) => participant !== username));
     const friends = await User.find({ username: { $in: friendUsernames } })
       .select("username displayName avatar banner bio status").lean();
     const friendsByUsername = new Map(friends.map((friend) => [friend.username, friend]));
 
     res.json({ success: true, chats: friendChats.map((chat) => ({
       ...chat.toObject(),
-      friend: friendsByUsername.get(chat.participants.find((participant) => participant !== username)) || null
-    })).filter((chat) => chat.friend) });
+      friend: chat.type === "group" ? null : friendsByUsername.get(chat.participants.find((participant) => participant !== username)) || null,
+      unreadCount: chat.messages.filter((message) => message.sender !== username && !(message.readBy || []).includes(username)).length
+    })).filter((chat) => chat.type === "group" || chat.friend) });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: "Server Error" });
@@ -60,6 +63,7 @@ const getChat = async (req, res) => {
     }
     const visibleChat = chat.toObject();
     visibleChat.messages = visibleChat.messages.filter((message) => !(message.hiddenFor || []).includes(username));
+    await Chat.updateOne({ _id: chatId }, { $addToSet: { "messages.$[message].readBy": username } }, { arrayFilters: [{ "message.sender": { $ne: username } }] });
     res.json({ success: true, chat: visibleChat });
   } catch (err) {
     console.error(err);
@@ -184,7 +188,8 @@ const sendMessage = async (req, res) => {
       sender: username,
       type: "text",
       text: text.trim(),
-      mediaUrl: ""
+      mediaUrl: "",
+      readBy: [username]
     };
     chat.messages.push(message);
     chat.lastMessage = { sender: username, text: message.text, createdAt: new Date() };
@@ -213,15 +218,18 @@ const uploadChatAttachment = async (req, res) => {
     if (!chat.participants.includes(username)) {
       return res.status(403).json({ success: false, message: "Access denied." });
     }
-    if (chat.type !== "private") {
-      return res.status(403).json({ success: false, message: "Media attachments are only allowed in private chats." });
+    if (!["private", "group"].includes(chat.type)) {
+      return res.status(403).json({ success: false, message: "Media attachments are not available in this chat." });
     }
 
     if (messageType === "image" && !["image/jpeg", "image/png", "image/gif", "image/webp"].includes(req.file.mimetype)) {
       return res.status(400).json({ success: false, message: "Choose a PNG, JPG, WEBP, or GIF image." });
     }
+    if (messageType === "video" && !["video/mp4", "video/webm"].includes(req.file.mimetype)) {
+      return res.status(400).json({ success: false, message: "Choose an MP4 or WEBM video." });
+    }
 
-    const validTypes = ["image", "voice"];
+    const validTypes = ["image", "video", "voice"];
     const type = validTypes.includes(messageType) ? messageType : "image";
     const mediaUrl = req.file.secure_url || req.file.path || req.file.url;
     if (!mediaUrl) {
@@ -230,7 +238,7 @@ const uploadChatAttachment = async (req, res) => {
     const messageData = {
       type,
       mediaUrl,
-      text: type === "voice" ? "Sent a voice note." : req.file.mimetype === "image/gif" ? "Sent a GIF." : "Sent an image."
+      text: type === "voice" ? "Sent a voice note." : type === "video" ? "Sent a video." : req.file.mimetype === "image/gif" ? "Sent a GIF." : "Sent an image."
     };
     const message = await createAttachmentMessage(chat, username, messageData);
 
@@ -302,6 +310,37 @@ const deleteForMe = async (req, res) => {
   } catch (err) { console.error(err); res.status(500).json({ success: false, message: "Server Error" }); }
 };
 
+const toggleReaction = async (req, res) => {
+  try {
+    const username = req.user.username;
+    const emoji = String(req.body.emoji || "").trim();
+    if (!["👍", "❤️", "😂", "😮", "😢"].includes(emoji)) return res.status(400).json({ success: false, message: "Unsupported reaction." });
+    const chat = await Chat.findById(req.params.id);
+    if (!chat || !chat.participants.includes(username)) return res.status(404).json({ success: false, message: "Chat not found." });
+    const message = chat.messages.find((item) => item.messageId === req.params.messageId);
+    if (!message) return res.status(404).json({ success: false, message: "Message not found." });
+    if (!message.reactions) message.reactions = [];
+    let reaction = message.reactions.find((item) => item.emoji === emoji);
+    if (!reaction) { message.reactions.push({ emoji, users: [username] }); } else if (reaction.users.includes(username)) { reaction.users = reaction.users.filter((user) => user !== username); } else { reaction.users.push(username); }
+    message.reactions = message.reactions.filter((item) => item.users.length);
+    await chat.save();
+    res.json({ success: true, reactions: message.reactions });
+  } catch (error) { console.error(error); res.status(500).json({ success: false, message: "Unable to update reaction." }); }
+};
+
+const sendGif = async (req, res) => {
+  try {
+    const username = req.user.username;
+    const mediaUrl = String(req.body.mediaUrl || "");
+    const parsed = new URL(mediaUrl);
+    if (!/^(media|c)\.tenor\.com$/i.test(parsed.hostname)) return res.status(400).json({ success: false, message: "Choose a GIF from Tenor." });
+    const chat = await Chat.findById(req.params.id);
+    if (!chat || !chat.participants.includes(username) || !["private", "group"].includes(chat.type)) return res.status(403).json({ success: false, message: "GIFs are not available in this chat." });
+    const message = await createAttachmentMessage(chat, username, { type: "image", mediaUrl, text: "Sent a GIF." });
+    res.json({ success: true, message });
+  } catch (_) { res.status(400).json({ success: false, message: "Invalid GIF." }); }
+};
+
 module.exports = {
   getUserChats,
   getChat,
@@ -312,4 +351,5 @@ module.exports = {
   uploadChatAttachment,
   unsendMessage,
   deleteForMe
+  ,toggleReaction, sendGif
 };

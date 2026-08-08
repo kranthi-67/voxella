@@ -12,6 +12,8 @@ const randomChat = document.getElementById("randomChat");
 const groupChat = document.getElementById("groupChat");
 const friendsCard = document.getElementById("friendsCard");
 const myChatsCard = document.getElementById("myChats");
+const groupChatsCard = document.getElementById("groupChats");
+const aboutCard = document.getElementById("aboutCard");
 const logoutCard = document.querySelector(".logout");
 
 const userAvatar = document.getElementById("userAvatar");
@@ -207,6 +209,8 @@ friendsCard.addEventListener("click", () => {
 myChatsCard.addEventListener("click", () => {
     window.location.href = "my-chats.html";
 });
+groupChatsCard.addEventListener("click", () => { window.location.href = "my-chats.html?tab=groups"; });
+aboutCard.addEventListener("click", () => { aboutModal.style.display = "flex"; });
 
 // ======================================
 // Logout
@@ -239,11 +243,24 @@ const aboutModal = document.getElementById("aboutModal");
 
 const closeAbout = document.getElementById("closeAbout");
 
-aboutBtn.onclick = () => {
+if (aboutBtn) aboutBtn.onclick = () => {
 
     aboutModal.style.display = "flex";
 
 };
+
+async function refreshNotifications() {
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+    if (!token) return;
+    try {
+        const data = await fetch("/api/chat/list", { headers: { Authorization: `Bearer ${token}` } }).then((r) => r.json());
+        const unread = data.success && data.chats.some((chat) => chat.unreadCount > 0);
+        document.getElementById("notificationDot").hidden = !unread;
+        document.getElementById("shortcutDot").hidden = !unread;
+    } catch (_) {}
+}
+refreshNotifications();
+setInterval(refreshNotifications, 15000);
 
 closeAbout.onclick = () => {
 

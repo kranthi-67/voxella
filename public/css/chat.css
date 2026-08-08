@@ -122,6 +122,7 @@ body{
 .msgText{padding:12px 16px;border-radius:14px;background:#2a2a2a}
 .messageRow.me .msgText{background:#ff3b3b;color:#fff}
 .chatImage{max-width:min(320px,100%);border-radius:12px;display:block;background:#242424}
+.chatImage{cursor:zoom-in}.chatVideo{width:min(440px,100%);max-height:360px;border-radius:12px;background:#000;display:block}
 .voiceNote{display:block;max-width:100%;min-width:240px}
 .mediaError{padding:10px 12px;border-radius:12px;background:#2a2a2a;color:#d3d3d3}
 .messageTime{display:block;margin:5px 4px 0;color:#8f8f9a;font-size:11px}.messageRow.me .messageTime{text-align:right}
@@ -154,6 +155,8 @@ body{
 .actionBtn.unsendBtn{ color:#ff9aa2; }
 .actionBtn.deleteBtn{color:#b9c4ff}.messageRow:hover .messageActions{opacity:1}.messageActions{opacity:.72;transition:opacity .18s ease}
 .actionBtn.replyBtn{color:#8de5ff}
+.reactionTray{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}.reactionPill{border:1px solid rgba(255,255,255,.14);border-radius:999px;background:rgba(255,255,255,.07);padding:4px 8px;color:#fff;cursor:pointer}.reactionPill.selected{border-color:#ff7583;background:rgba(255,76,96,.2)}.mediaViewer{max-width:min(92vw,920px);max-height:90vh;padding:12px;border:1px solid rgba(255,255,255,.18);border-radius:18px;background:#111}.mediaViewer::backdrop{background:rgba(0,0,0,.8);backdrop-filter:blur(5px)}.mediaViewer img{display:block;max-width:100%;max-height:80vh;border-radius:10px}.mediaViewer button{position:absolute;right:8px;top:8px;border:0;border-radius:50%;width:34px;height:34px;background:#fff;color:#111;font-size:24px;cursor:pointer}
+.reactionChooser{display:flex;gap:4px;margin-top:6px}.reactionChooser button{border:0;border-radius:8px;background:#34343d;padding:5px;cursor:pointer}.gifPicker{width:min(720px,94vw);height:min(650px,88vh);border:1px solid rgba(255,255,255,.18);border-radius:18px;background:#16161b;color:#fff;padding:20px}.gifPicker::backdrop{background:rgba(0,0,0,.72);backdrop-filter:blur(4px)}.gifPicker>button{float:right;border:0;border-radius:50%;width:32px;height:32px;font-size:22px;cursor:pointer}.gifPicker form{display:flex;gap:8px;margin:16px 0}.gifPicker input{flex:1;border:1px solid #42424a;border-radius:10px;padding:10px;background:#25252c;color:#fff}.gifPicker form button{border:0;border-radius:10px;padding:0 14px;background:#ff4e62;color:#fff;font-weight:700}.gifResults{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;overflow:auto;max-height:460px}.gifResults button{border:0;padding:0;background:#25252c;border-radius:10px;overflow:hidden;cursor:pointer}.gifResults img{display:block;width:100%;height:110px;object-fit:cover}
 
 .message{
 

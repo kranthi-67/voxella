@@ -40,6 +40,8 @@
     <div class="chatActions" id="chatActions">
         <input id="chatSearch" type="search" placeholder="Search messages" aria-label="Search messages">
         <button id="attachImageBtn" class="secondary">Image</button>
+        <button id="gifBtn" class="secondary">GIF</button>
+        <button id="attachVideoBtn" class="secondary">Video</button>
         <button id="recordAudioBtn" class="secondary">Voice Note</button>
         <button id="startCallBtn" class="secondary">Voice Call</button>
     </div>
@@ -65,7 +67,11 @@
     </div>
 
     <input type="file" id="imageInput" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+    <input type="file" id="videoInput" accept="video/mp4,video/webm" hidden>
     <audio id="remoteAudio" autoplay hidden></audio>
+
+    <dialog id="mediaViewer" class="mediaViewer"><button id="closeMediaViewer" aria-label="Close media">×</button><img id="viewerImage" alt="Shared image preview"></dialog>
+    <dialog id="gifPicker" class="gifPicker"><button id="closeGifPicker" aria-label="Close GIF picker">×</button><h3>Search Tenor GIFs</h3><form id="gifSearchForm"><input id="gifSearchInput" placeholder="Search GIFs" required><button>Search</button></form><p id="gifStatus"></p><div id="gifResults" class="gifResults"></div></dialog>
 
 </div>
 

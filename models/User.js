@@ -100,6 +100,10 @@ const userSchema = new mongoose.Schema({
         default: []
     },
 
+    isBanned: { type: Boolean, default: false },
+    bannedAt: { type: Date, default: null },
+    banReason: { type: String, default: "", maxlength: 300 },
+
     reports: [
         {
             reportedBy: {

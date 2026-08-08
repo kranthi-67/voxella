@@ -25,6 +25,7 @@ function createFriendCard(friend, chat) {
   const card = document.createElement("article");
   card.className = "card profileCard chatCard";
   card.dataset.search = `${friend.displayName || ""} ${friend.username || ""} ${chat?.lastMessage?.text || ""}`.toLowerCase();
+  if (chat?.unreadCount) card.classList.add("hasUnread");
 
   const banner = document.createElement("div");
   banner.className = "profileBanner";
@@ -40,7 +41,7 @@ function createFriendCard(friend, chat) {
   avatar.onerror = () => { avatar.src = DEFAULT_AVATAR; };
   content.appendChild(avatar);
   addText(content, "h2", friend.displayName || friend.username);
-  addText(content, `p`, `@${friend.username}`, "usernameText");
+  addText(content, `p`, `@${friend.username}${chat?.unreadCount ? ` · ${chat.unreadCount} new` : ""}`, "usernameText");
 
   if (chat) {
     const lastSender = chat.lastMessage?.sender === localStorage.getItem("username") ? "You" : chat.lastMessage?.sender || "System";
@@ -74,6 +75,13 @@ function createFriendCard(friend, chat) {
   return card;
 }
 
+function createGroupCard(chat) {
+  const card = document.createElement("article"); card.className = "card chatCard";
+  addText(card, "h2", chat.title || "Group chat");
+  addText(card, "p", `${chat.participants.length} members · ${chat.lastMessage?.text || "No messages yet."}`, "chatPreview");
+  const button = document.createElement("button"); button.className = "primary"; button.textContent = "Open Group"; button.onclick = () => { window.location.href = `chat.html?chatId=${encodeURIComponent(chat._id)}`; }; card.appendChild(button); return card;
+}
+
 async function loadChats() {
   try {
     const [chatResponse, friendsResponse] = await Promise.all([
@@ -84,8 +92,11 @@ async function loadChats() {
     const friendsData = await friendsResponse.json();
     if (!chatData.success || !friendsData.success) throw new Error("Unable to load your chats.");
 
-    const chatsByFriend = new Map(chatData.chats.map((chat) => [chat.friend.username, chat]));
+    const directChats = chatData.chats.filter((chat) => chat.type === "private");
+    const groupChats = chatData.chats.filter((chat) => chat.type === "group");
+    const chatsByFriend = new Map(directChats.map((chat) => [chat.friend.username, chat]));
     chatList.replaceChildren();
+    if (new URLSearchParams(window.location.search).get("tab") === "groups") { groupChats.forEach((chat) => chatList.appendChild(createGroupCard(chat))); if (!groupChats.length) addText(chatList, "p", "No group chats yet.", "emptyState"); return; }
     if (!friendsData.friends.length) {
       addText(chatList, "p", "No friends yet. Find friends first to begin a direct message.", "emptyState");
       return;
@@ -94,6 +105,7 @@ async function loadChats() {
     friendsData.friends
       .sort((a, b) => (chatsByFriend.has(b.username) - chatsByFriend.has(a.username)) || a.displayName.localeCompare(b.displayName))
       .forEach((friend) => chatList.appendChild(createFriendCard(friend, chatsByFriend.get(friend.username))));
+    groupChats.forEach((chat) => chatList.appendChild(createGroupCard(chat)));
   } catch (error) {
     chatList.replaceChildren();
     addText(chatList, "p", error.message || "Unable to load your chats.", "emptyState");

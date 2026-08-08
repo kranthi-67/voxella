@@ -13,6 +13,8 @@ const authRoutes = require("./routes/auth");
 const profileRoutes = require("./routes/profile");
 const friendsRoutes = require("./routes/friends");
 const chatRoutes = require("./routes/chat");
+const adminRoutes = require("./routes/admin");
+const gifRoutes = require("./routes/gifs");
 
 const app = express();
 const server = http.createServer(app);
@@ -50,6 +52,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/friends", friendsRoutes);
 app.use("/api/chat", chatRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/gifs", gifRoutes);
 
 app.use((error, req, res, next) => {
     if (error) {
@@ -121,6 +125,11 @@ io.on("connection", (socket) => {
     socket.on("unsendMessage", ({ roomId, messageId }) => {
         if (!roomId || !messageId || activeRooms.get(socket.id)?.roomId !== roomId) return;
         socket.to(roomId).emit("messageUnsent", { messageId });
+    });
+
+    socket.on("messageReaction", ({ roomId, messageId, reactions }) => {
+        if (!roomId || !messageId || activeRooms.get(socket.id)?.roomId !== roomId) return;
+        socket.to(roomId).emit("messageReaction", { messageId, reactions });
     });
 
     socket.on("typing", ({ roomId, isTyping }) => {
