@@ -29,7 +29,7 @@ const getUserChats = async (req, res) => {
 
     const chats = await Chat.find({ participants: username, type: { $in: ["private", "group"] } })
       .sort({ updatedAt: -1 })
-      .select("_id type title participants messages.sender messages.readBy lastMessage updatedAt");
+      .select("_id type title owner avatar participants messages.sender messages.readBy lastMessage updatedAt");
 
     const friendChats = chats.filter((chat) => {
       if (chat.type === "group") return true;
@@ -117,7 +117,7 @@ const createGroupChat = async (req, res) => {
     if (!self || members.some((member) => !self.friends.includes(member) || self.blockedUsers.includes(member))) return res.status(403).json({ success: false, message: "Groups can only include your friends." });
     const people = await User.find({ username: { $in: members } }).select("username blockedUsers");
     if (people.length !== members.length || people.some((person) => person.blockedUsers.includes(username))) return res.status(403).json({ success: false, message: "One or more friends cannot be added." });
-    const chat = await Chat.create({ type: "group", participants: [username, ...members], title, lastMessage: { sender: "system", text: "Group created." } });
+    const chat = await Chat.create({ type: "group", owner: username, participants: [username, ...members], title, lastMessage: { sender: "system", text: "Group created." } });
     res.status(201).json({ success: true, chatId: chat._id });
   } catch (err) { console.error(err); res.status(500).json({ success: false, message: "Server Error" }); }
 };
@@ -333,12 +333,45 @@ const sendGif = async (req, res) => {
     const username = req.user.username;
     const mediaUrl = String(req.body.mediaUrl || "");
     const parsed = new URL(mediaUrl);
-    if (!/^(media|c)\.tenor\.com$/i.test(parsed.hostname)) return res.status(400).json({ success: false, message: "Choose a GIF from Tenor." });
+    if (!/^(media|i)\.giphy\.com$/i.test(parsed.hostname)) return res.status(400).json({ success: false, message: "Choose a GIF from GIPHY." });
     const chat = await Chat.findById(req.params.id);
     if (!chat || !chat.participants.includes(username) || !["private", "group"].includes(chat.type)) return res.status(403).json({ success: false, message: "GIFs are not available in this chat." });
     const message = await createAttachmentMessage(chat, username, { type: "image", mediaUrl, text: "Sent a GIF." });
     res.json({ success: true, message });
   } catch (_) { res.status(400).json({ success: false, message: "Invalid GIF." }); }
+};
+
+const addGroupMember = async (req, res) => {
+  try {
+    const username = req.user.username;
+    const member = String(req.body.username || "").trim().toLowerCase();
+    const chat = await Chat.findById(req.params.id);
+    if (!chat || chat.type !== "group") return res.status(404).json({ success: false, message: "Group not found." });
+    const owner = chat.owner || chat.participants[0];
+    if (owner !== username) return res.status(403).json({ success: false, message: "Only the group creator can add members." });
+    if (!chat.owner) chat.owner = owner;
+    if (!member || chat.participants.includes(member)) return res.status(400).json({ success: false, message: "Choose a person who is not already in this group." });
+    const [self, person] = await Promise.all([User.findOne({ username }).select("friends blockedUsers"), User.findOne({ username: member }).select("username blockedUsers")]);
+    if (!person) return res.status(404).json({ success: false, message: "Profile not found." });
+    if (!self.friends.includes(member) || self.blockedUsers.includes(member) || person.blockedUsers.includes(username)) return res.status(403).json({ success: false, message: "You can only add friends who have not blocked you." });
+    chat.participants.push(member);
+    chat.lastMessage = { sender: "system", text: `${member} was added to the group.`, createdAt: new Date() };
+    await chat.save();
+    res.json({ success: true, message: "Member added." });
+  } catch (error) { console.error(error); res.status(500).json({ success: false, message: "Unable to add member." }); }
+};
+
+const uploadGroupAvatar = async (req, res) => {
+  try {
+    const chat = await Chat.findById(req.params.id);
+    if (!chat || chat.type !== "group") return res.status(404).json({ success: false, message: "Group not found." });
+    const owner = chat.owner || chat.participants[0];
+    if (owner !== req.user.username) return res.status(403).json({ success: false, message: "Only the group creator can change the group picture." });
+    if (!req.file || !String(req.file.mimetype).startsWith("image/")) return res.status(400).json({ success: false, message: "Choose an image for the group picture." });
+    chat.avatar = req.file.secure_url || req.file.path || req.file.url;
+    await chat.save();
+    res.json({ success: true, url: chat.avatar });
+  } catch (error) { console.error(error); res.status(500).json({ success: false, message: "Unable to update group picture." }); }
 };
 
 module.exports = {
@@ -351,5 +384,5 @@ module.exports = {
   uploadChatAttachment,
   unsendMessage,
   deleteForMe
-  ,toggleReaction, sendGif
+  ,toggleReaction, sendGif, addGroupMember, uploadGroupAvatar
 };

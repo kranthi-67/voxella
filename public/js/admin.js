@@ -9,11 +9,12 @@ async function load() {
   data.users.forEach((user) => {
     const card = document.createElement("article"); card.className = "card";
     const heading = document.createElement("h2"); heading.textContent = user.displayName || user.username; card.appendChild(heading);
-    text(card, `@${user.username} · ${user.email}`); text(card, `Reports: ${user.reportCount}${user.banReason ? ` · Reason: ${user.banReason}` : ""}`);
+    text(card, `@${user.username} · ${user.email}${user.isOwner ? " · Original owner" : user.role === "sub_admin" ? " · Sub-admin" : ""}`); text(card, `Reports: ${user.reportCount}${user.banReason ? ` · Reason: ${user.banReason}` : ""}`);
     if (user.reports.length) text(card, user.reports.map((r) => `${r.reportedBy}: ${r.reason || "No reason"}`).join(" | "));
     const button = document.createElement("button"); button.className = user.isBanned ? "secondary" : "primary"; button.textContent = user.isBanned ? "Unban account" : "Ban account";
     button.onclick = async () => { const reason = user.isBanned ? "" : prompt("Ban reason (optional):", ""); if (reason === null) return; const result = await fetch("/api/admin/ban", { method: "POST", headers, body: JSON.stringify({ email: user.email, banned: !user.isBanned, reason }) }).then(r => r.json()); alert(result.message); if (result.success) load(); };
     card.appendChild(button); list.appendChild(card);
+    if (data.isOwner && !user.isOwner) { const roleButton = document.createElement("button"); roleButton.className = "secondary"; roleButton.textContent = user.role === "sub_admin" ? "Remove sub-admin" : "Make sub-admin"; roleButton.onclick = async () => { const result = await fetch("/api/admin/sub-admin", { method: "POST", headers, body: JSON.stringify({ email: user.email, enabled: user.role !== "sub_admin" }) }).then(r => r.json()); alert(result.message); if (result.success) load(); }; card.appendChild(roleButton); }
   });
 }
 load();

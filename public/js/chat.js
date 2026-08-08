@@ -145,7 +145,7 @@ async function sendGif(mediaUrl) {
 }
 
 async function searchGifs(query) {
-  gifResults.replaceChildren(); gifStatus.textContent = "Searching Tenor…";
+  gifResults.replaceChildren(); gifStatus.textContent = "Searching GIPHY…";
   const data = await fetch(`/api/gifs/search?q=${encodeURIComponent(query)}`).then((response) => response.json());
   if (!data.success) { gifStatus.textContent = data.message || "GIF search is unavailable."; return; }
   gifStatus.textContent = data.results.length ? "Choose a GIF" : "No GIFs found.";

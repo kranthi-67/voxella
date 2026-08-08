@@ -56,6 +56,8 @@ const chatSchema = new mongoose.Schema({
         required: true,
         default: []
     },
+    owner: { type: String, default: "", trim: true, lowercase: true },
+    avatar: { type: String, default: "" },
     isOpen: {
         type: Boolean,
         default: true

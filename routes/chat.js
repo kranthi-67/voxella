@@ -12,7 +12,7 @@ const {
   uploadChatAttachment,
   unsendMessage,
   deleteForMe
-  ,toggleReaction, sendGif
+  ,toggleReaction, sendGif, addGroupMember, uploadGroupAvatar
 } = require("../controllers/chatController");
 
 router.get("/list", authMiddleware, getUserChats);
@@ -26,5 +26,7 @@ router.delete("/:id/message/:messageId", authMiddleware, unsendMessage);
 router.patch("/:id/message/:messageId/hide", authMiddleware, deleteForMe);
 router.post("/:id/message/:messageId/reaction", authMiddleware, toggleReaction);
 router.post("/:id/gif", authMiddleware, sendGif);
+router.post("/:id/members", authMiddleware, addGroupMember);
+router.post("/:id/avatar", authMiddleware, upload.single("image"), uploadGroupAvatar);
 
 module.exports = router;

@@ -77,9 +77,13 @@ function createFriendCard(friend, chat) {
 
 function createGroupCard(chat) {
   const card = document.createElement("article"); card.className = "card chatCard";
+  const avatar = document.createElement("img"); avatar.className = "groupAvatar"; avatar.src = chat.avatar || DEFAULT_AVATAR; avatar.alt = `${chat.title || "Group"} picture`; avatar.onerror = () => { avatar.src = DEFAULT_AVATAR; }; card.appendChild(avatar);
   addText(card, "h2", chat.title || "Group chat");
   addText(card, "p", `${chat.participants.length} members · ${chat.lastMessage?.text || "No messages yet."}`, "chatPreview");
-  const button = document.createElement("button"); button.className = "primary"; button.textContent = "Open Group"; button.onclick = () => { window.location.href = `chat.html?chatId=${encodeURIComponent(chat._id)}`; }; card.appendChild(button); return card;
+  const button = document.createElement("button"); button.className = "primary"; button.textContent = "Open Group"; button.onclick = () => { window.location.href = `chat.html?chatId=${encodeURIComponent(chat._id)}`; }; card.appendChild(button);
+  const currentUser = localStorage.getItem("username") || sessionStorage.getItem("username");
+  if (chat.owner === currentUser || (!chat.owner && chat.participants[0] === currentUser)) { const add = document.createElement("button"); add.className = "secondary"; add.textContent = "Add profile"; add.onclick = async () => { const username = prompt("Friend username to add:"); if (!username) return; const result = await fetch(`/api/chat/${encodeURIComponent(chat._id)}/members`, { method: "POST", headers: authHeaders, body: JSON.stringify({ username }) }).then((response) => response.json()); alert(result.message); if (result.success) loadChats(); }; card.appendChild(add); const picture = document.createElement("button"); picture.className = "secondary"; picture.textContent = "Group picture"; const file = document.createElement("input"); file.type = "file"; file.accept = "image/png,image/jpeg,image/webp"; file.hidden = true; picture.onclick = () => file.click(); file.onchange = async () => { const selected = file.files[0]; if (!selected) return; const form = new FormData(); form.append("type", "chat"); form.append("image", selected); const result = await fetch(`/api/chat/${encodeURIComponent(chat._id)}/avatar`, { method: "POST", headers: { Authorization: `Bearer ${token}` }, body: form }).then((response) => response.json()); alert(result.message || (result.success ? "Group picture updated." : "Upload failed.")); if (result.success) loadChats(); }; card.append(picture, file); }
+  return card;
 }
 
 async function loadChats() {
