@@ -152,6 +152,26 @@ async function searchGifs(query) {
   data.results.forEach((gif) => { const button = document.createElement("button"); const image = document.createElement("img"); image.src = gif.preview; image.alt = "GIF result"; button.appendChild(image); button.onclick = async () => { try { await sendGif(gif.url); } catch (error) { alert(error.message); } }; gifResults.appendChild(button); });
 }
 
+async function loadGifs(query) {
+  gifResults.replaceChildren();
+  gifStatus.textContent = query ? "Searching GIFs..." : "Loading popular GIFs...";
+  try {
+    const response = await fetch(`/api/gifs/search?q=${encodeURIComponent(query)}`);
+    const data = await response.json();
+    if (!response.ok || !data.success) throw new Error(data.message || "GIF search is unavailable.");
+    gifStatus.textContent = data.results.length ? "Pick one to send" : "No GIFs found. Try another search.";
+    data.results.forEach((gif) => {
+      const button = document.createElement("button");
+      const image = document.createElement("img");
+      image.src = gif.preview; image.alt = "GIF result"; image.loading = "lazy";
+      image.onerror = () => button.remove();
+      button.appendChild(image);
+      button.onclick = async () => { button.disabled = true; gifStatus.textContent = "Sending GIF..."; try { await sendGif(gif.url); } catch (error) { gifStatus.textContent = error.message || "GIF could not be sent."; button.disabled = false; } };
+      gifResults.appendChild(button);
+    });
+  } catch (error) { gifStatus.textContent = error.message || "GIF search is unavailable."; }
+}
+
 function appendMessage(payload) {
   const key = messageKey(payload);
   if (renderedMessages.has(key)) return;
@@ -200,7 +220,7 @@ function appendMessage(payload) {
   } else {
     const text = document.createElement("p");
     text.className = "msgText";
-    text.textContent = kind === "me" ? `You: ${payload.text || ""}` : `${payload.sender}: ${payload.text || ""}`;
+    text.textContent = payload.text || "";
     content.appendChild(text);
   }
 
@@ -479,7 +499,7 @@ sendBtn.addEventListener("click", async () => {
 });
 
 attachImageBtn.addEventListener("click", () => imageInput.click());
-gifBtn.addEventListener("click", () => { gifPicker.showModal(); gifSearchInput.focus(); });
+gifBtn.addEventListener("click", () => { gifPicker.showModal(); gifSearchInput.focus(); if (!gifResults.children.length) loadGifs(""); });
 attachVideoBtn.addEventListener("click", () => videoInput.click());
 imageInput.addEventListener("change", async () => {
   const file = imageInput.files[0];
@@ -547,7 +567,7 @@ chatSearch.addEventListener("input", filterMessages);
 closeMediaViewer.addEventListener("click", () => mediaViewer.close());
 mediaViewer.addEventListener("click", (event) => { if (event.target === mediaViewer) mediaViewer.close(); });
 closeGifPicker.addEventListener("click", () => gifPicker.close());
-gifSearchForm.addEventListener("submit", (event) => { event.preventDefault(); searchGifs(gifSearchInput.value.trim()); });
+gifSearchForm.addEventListener("submit", (event) => { event.preventDefault(); loadGifs(gifSearchInput.value.trim()); });
 updateMessageCount();
 skipBtn.onclick = () => window.location.reload();
 leaveBtn.onclick = () => window.location.href = "dashboard.html";

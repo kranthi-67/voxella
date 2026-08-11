@@ -55,6 +55,10 @@ body{
 
 }
 
+.profileNav{position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:20;width:min(920px,calc(100% - 32px));height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border:1px solid var(--panel-edge);border-radius:12px;background:rgba(18,18,18,.78);backdrop-filter:blur(16px)}
+.profileNav a{color:var(--text-mid);text-decoration:none;font-size:13px;font-weight:700;margin-left:16px}.profileNav a:hover,.profileNav .profileBrand{color:var(--text-hi)}.profileNav .profileBrand{margin:0;letter-spacing:.1em}
+@media(max-width:480px){.profileNav a{margin-left:9px;font-size:12px}.profileNav div a:first-child{display:none}}
+
 /* ambient page glow — the embers the whole page sits in */
 
 .pageGlow{

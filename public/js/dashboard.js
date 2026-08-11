@@ -9,6 +9,7 @@ console.log("Dashboard Loaded!");
 // ======================================
 
 const randomChat = document.getElementById("randomChat");
+const randomChatHero = document.getElementById("randomChatHero");
 const groupChat = document.getElementById("groupChat");
 const friendsCard = document.getElementById("friendsCard");
 const myChatsCard = document.getElementById("myChats");
@@ -56,7 +57,7 @@ async function loadProfile() {
         const user = data.user;
 
         displayName.textContent = user.displayName;
-        usernameText.textContent = "@" + user.username;
+        if (usernameText) usernameText.textContent = "@" + user.username;
 
         cardDisplayName.textContent = user.displayName;
         cardUsername.textContent = "@" + user.username;
@@ -64,13 +65,13 @@ async function loadProfile() {
         cardBio.textContent =
             user.bio || "No bio yet.";
 
-        statusBadge.textContent =
-
-            statusUtils.getStatusBadgeText(
+        if (statusBadge) {
+            statusBadge.textContent = statusUtils.getStatusBadgeText(
                 user.status,
                 user.statusNote,
                 user.statusNoteExpiresAt
             );
+        }
 
         /* Legacy fallback for old browser bundles:
             "🟢 " + user.status;
@@ -97,7 +98,7 @@ async function loadProfile() {
         // Apply Theme
         // ==========================
 
-        profileCard.className = "card profileCard";
+        profileCard.className = "profileCard";
 
         switch (String(user.theme || "Crimson").toLowerCase()) {
 
@@ -195,6 +196,10 @@ profileLink.addEventListener("click", (event) => {
 
 
 randomChat.addEventListener("click", () => {
+    window.location.href = "chat.html";
+});
+
+randomChatHero?.addEventListener("click", () => {
     window.location.href = "chat.html";
 });
 

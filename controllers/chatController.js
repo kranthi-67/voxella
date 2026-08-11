@@ -333,7 +333,7 @@ const sendGif = async (req, res) => {
     const username = req.user.username;
     const mediaUrl = String(req.body.mediaUrl || "");
     const parsed = new URL(mediaUrl);
-    if (!/^(media|i)\.giphy\.com$/i.test(parsed.hostname)) return res.status(400).json({ success: false, message: "Choose a GIF from GIPHY." });
+    if (!/^(?:media\d*|i)\.giphy\.com$/i.test(parsed.hostname)) return res.status(400).json({ success: false, message: "Choose a GIF from GIPHY." });
     const chat = await Chat.findById(req.params.id);
     if (!chat || !chat.participants.includes(username) || !["private", "group"].includes(chat.type)) return res.status(403).json({ success: false, message: "GIFs are not available in this chat." });
     const message = await createAttachmentMessage(chat, username, { type: "image", mediaUrl, text: "Sent a GIF." });
