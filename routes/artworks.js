@@ -12,9 +12,9 @@ const {
     deleteArtwork
 } = require("../controllers/artworkController");
 
-// Public: anyone can browse
-router.get("/", listArtworks);
-router.get("/:id", getArtwork);
+// Members only: you must be logged in to browse
+router.get("/", authMiddleware, listArtworks);
+router.get("/:id", authMiddleware, getArtwork);
 
 // Logged in: post, edit, delete
 router.post("/", authMiddleware, uploadArtwork.array("images", 8), createArtwork);

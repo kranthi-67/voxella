@@ -5,17 +5,11 @@
 
   var postsBox = document.getElementById("posts");
   var moreBtn = document.getElementById("more");
-  var page = 1, loading = false;
+  var page = 1, loading = false, mode = "forYou";
 
   function renderComposer(me) {
     var box = document.getElementById("composer");
     box.textContent = "";
-    if (!Vx.token) {
-      box.appendChild(h("div", { class: "vxCard composer" },
-        h("div", { class: "vxGrow" }, h("strong", { text: "Join VOXELLA" }), h("div", { class: "vxMuted", text: "Share your work, message artists and commission with confidence." })),
-        h("a", { class: "vxBtn primary", href: "signup.html", text: "Join free" })));
-      return;
-    }
     var fake = h("button", { class: "fake", type: "button", text: me && me.userType === "seller" ? "Share your latest work…" : "Share something with the community…" });
     fake.addEventListener("click", function () { Vx.openCreate("post"); });
     var card = h("div", { class: "vxCard composer" }, Vx.avatar(me), fake,
@@ -24,9 +18,7 @@
   }
 
   function emptyFeed() {
-    var cta = Vx.token
-      ? h("button", { class: "vxBtn primary", type: "button", text: "Create the first post", onclick: function () { Vx.openCreate("post"); } })
-      : h("a", { class: "vxBtn primary", href: "signup.html", text: "Join and post" });
+    var cta = h("button", { class: "vxBtn primary", type: "button", text: "Create the first post", onclick: function () { Vx.openCreate("post"); } });
     return h("div", { class: "vxCard empty" }, h("div", { class: "ic" }, Vx.icon("image")), h("h3", { text: "Nothing here yet" }),
       h("p", { text: "Posts from artists and buyers show up here. Be the first to share some work." }), cta);
   }
@@ -35,7 +27,7 @@
     if (loading) return;
     loading = true; moreBtn.hidden = true;
     if (reset) { page = 1; postsBox.textContent = ""; postsBox.appendChild(Vx.skeletons(2, "", 360)); }
-    Vx.api("/api/posts?page=" + page + "&limit=8").then(function (data) {
+    Vx.api("/api/posts?feed=" + mode + "&page=" + page + "&limit=8").then(function (data) {
       if (reset) postsBox.textContent = "";
       loading = false;
       if (!data.success) { postsBox.appendChild(h("div", { class: "vxCard empty" }, h("h3", { text: "Could not load the feed" }), h("p", { text: data.message || "Try again in a moment." }))); return; }
@@ -45,6 +37,16 @@
     });
   }
   moreBtn.addEventListener("click", function () { page += 1; loadPosts(false); });
+  var tabForYou = document.getElementById("tabForYou"), tabLatest = document.getElementById("tabLatest");
+  function setMode(next) {
+    if (mode === next) return;
+    mode = next;
+    tabForYou.classList.toggle("on", mode === "forYou");
+    tabLatest.classList.toggle("on", mode === "latest");
+    loadPosts(true);
+  }
+  tabForYou.addEventListener("click", function () { setMode("forYou"); });
+  tabLatest.addEventListener("click", function () { setMode("latest"); });
   window.VxOnPosted = function () { loadPosts(true); };
 
   Vx.loadMe().then(renderComposer);

@@ -9,7 +9,7 @@
   var main = document.getElementById("profileMain");
   if (!USERNAME || !main) return;
 
-  var SPECIALTIES = ["digital-art", "illustration", "character-design", "concept-art", "pixel-art", "logo-design", "graphic-design", "ui-design", "animation", "3d-modeling", "3d-sculpting"];
+  var SPECIALTIES = Vx.ART_TYPES;
   var isOwner = Vx.username && Vx.username.toLowerCase() === USERNAME.toLowerCase();
   var user = null, tab = "works";
   var content = h("div");

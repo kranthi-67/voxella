@@ -9,7 +9,8 @@ const {
 
     uploadMedia,
     updateProfile,
-    getProfile
+    getProfile,
+    completeOnboarding
 
 } = require("../controllers/profileController");
 
@@ -32,6 +33,9 @@ router.put(
     updateProfile
 
 );
+
+// First-time setup (buyer/artist + art types)
+router.put("/onboarding", authMiddleware, completeOnboarding);
 
 // Get profile
 router.get(

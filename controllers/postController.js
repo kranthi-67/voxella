@@ -1,32 +1,29 @@
-const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const Post = require("../models/Post");
 const Artwork = require("../models/Artwork");
 const User = require("../models/User");
 const { VIDEO_TYPES } = require("../middleware/uploadPost");
+const { rankPosts } = require("../utils/feedScore");
 
 const fail = (res, status, message) => res.status(status).json({ success: false, message });
 
-const AUTHOR_FIELDS = "displayName username avatar userType ratingAverage ratingCount commissionsOpen isBanned";
-
-// The feed is public, but if a valid token is sent we can tell
-// which posts the viewer has already liked.
-const viewerIdFrom = (req) => {
-    const header = req.headers.authorization;
-    if (!header || !header.startsWith("Bearer ")) return null;
-    try {
-        return String(jwt.verify(header.split(" ")[1], process.env.JWT_SECRET).id);
-    } catch (_) {
-        return null;
-    }
-};
+const AUTHOR_FIELDS = "displayName username avatar userType ratingAverage ratingCount commissionsOpen specialties xp trophies isBanned";
 
 const shapePost = (post, viewerId) => ({
     _id: post._id,
     caption: post.caption,
     media: post.media,
     artwork: post.artwork || null,
-    author: post.author,
+    author: {
+        _id: post.author._id,
+        displayName: post.author.displayName,
+        username: post.author.username,
+        avatar: post.author.avatar,
+        userType: post.author.userType,
+        ratingAverage: post.author.ratingAverage,
+        ratingCount: post.author.ratingCount,
+        commissionsOpen: post.author.commissionsOpen
+    },
     createdAt: post.createdAt,
     likeCount: (post.likes || []).length,
     liked: viewerId ? (post.likes || []).some((id) => String(id) === viewerId) : false
@@ -71,39 +68,63 @@ const createPost = async (req, res) => {
     }
 };
 
-// GET /api/posts?author=username&page=1&limit=10
+// GET /api/posts?feed=forYou|latest&author=username&page=1&limit=10
 const listPosts = async (req, res) => {
     try {
-        const viewerId = viewerIdFrom(req);
-        const filter = {};
-
-        if (req.query.author) {
-            const author = await User.findOne({ username: String(req.query.author).toLowerCase() }).select("_id");
-            if (!author) return res.json({ success: true, posts: [], page: 1, hasMore: false });
-            filter.author = author._id;
-        }
-
+        const viewerId = String(req.user.id);
         const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 10, 1), 20);
         const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
 
-        const rows = await Post.find(filter)
-            .sort({ createdAt: -1 })
-            .skip((page - 1) * limit)
-            .limit(limit + 1)
-            .populate({ path: "author", select: AUTHOR_FIELDS })
-            .populate({ path: "artwork", select: "title images price forSale" })
-            .lean();
+        const populateAuthor = { path: "author", select: AUTHOR_FIELDS };
+        const populateArtwork = { path: "artwork", select: "title images price forSale" };
+        const visible = (post) => post.author && !post.author.isBanned;
 
-        const hasMore = rows.length > limit;
-        const posts = rows
-            .slice(0, limit)
-            .filter((post) => post.author && !post.author.isBanned)
-            .map((post) => {
-                delete post.author.isBanned;
-                return shapePost(post, viewerId);
+        // 1) One person's posts (profile page): newest first
+        if (req.query.author) {
+            const author = await User.findOne({ username: String(req.query.author).toLowerCase() }).select("_id");
+            if (!author) return res.json({ success: true, posts: [], page: 1, hasMore: false });
+
+            const rows = await Post.find({ author: author._id })
+                .sort({ createdAt: -1 })
+                .skip((page - 1) * limit)
+                .limit(limit + 1)
+                .populate(populateAuthor).populate(populateArtwork).lean();
+
+            return res.json({
+                success: true, page, hasMore: rows.length > limit,
+                posts: rows.slice(0, limit).filter(visible).map((post) => shapePost(post, viewerId))
             });
+        }
 
-        res.json({ success: true, posts, page, hasMore });
+        // 2) Latest: newest first
+        if (req.query.feed === "latest") {
+            const rows = await Post.find({})
+                .sort({ createdAt: -1 })
+                .skip((page - 1) * limit)
+                .limit(limit + 1)
+                .populate(populateAuthor).populate(populateArtwork).lean();
+
+            return res.json({
+                success: true, page, hasMore: rows.length > limit, feed: "latest",
+                posts: rows.slice(0, limit).filter(visible).map((post) => shapePost(post, viewerId))
+            });
+        }
+
+        // 3) For you: rank the 150 most recent posts by interest, popularity and trust
+        const viewer = await User.findById(viewerId).select("interests").lean();
+        const candidates = await Post.find({})
+            .sort({ createdAt: -1 })
+            .limit(150)
+            .populate(populateAuthor).populate(populateArtwork).lean();
+
+        const ranked = rankPosts(candidates.filter(visible), { _id: viewerId, interests: (viewer && viewer.interests) || [] });
+        const slice = ranked.slice((page - 1) * limit, page * limit);
+
+        res.json({
+            success: true, page, feed: "forYou",
+            hasMore: ranked.length > page * limit,
+            posts: slice.map((post) => shapePost(post, viewerId))
+        });
     } catch (err) {
         console.error(err);
         fail(res, 500, "Server Error");

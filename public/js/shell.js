@@ -11,6 +11,15 @@
 
   var Vx = window.Vx = { token: TOKEN, username: USERNAME, me: null, DEFAULT_AVATAR: DEFAULT_AVATAR };
 
+  // Art types, grouped for the pickers (keep in sync with config/marketplace.js)
+  Vx.ART_TYPE_GROUPS = [
+    { key: "traditional", title: "Traditional", items: ["traditional-art", "sketching", "watercolor", "oil-painting", "calligraphy", "sculpture"] },
+    { key: "digital", title: "Digital", items: ["digital-art", "illustration", "character-design", "concept-art", "pixel-art", "animation"] },
+    { key: "design", title: "Design", items: ["logo-design", "graphic-design", "ui-design"] },
+    { key: "3d", title: "3D", items: ["3d-modeling", "3d-sculpting"] }
+  ];
+  Vx.ART_TYPES = Vx.ART_TYPE_GROUPS.reduce(function (all, g) { return all.concat(g.items); }, []);
+
   // ---------- tiny DOM builder (never uses innerHTML for user text) ----------
   function append(el, child) {
     if (child === null || child === undefined || child === false) return;
@@ -87,7 +96,7 @@
     try { return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: n % 1 ? 2 : 0 }).format(n); }
     catch (_) { return "$" + n; }
   };
-  var LABELS = { "3d-model": "3D model", "3d-modeling": "3D modeling", "3d-sculpting": "3D sculpting", ui: "UI" };
+  var LABELS = { "3d-model": "3D model", "3d-modeling": "3D modeling", "3d-sculpting": "3D sculpting", "ui-design": "UI design" };
   Vx.label = function (slug) {
     slug = String(slug || "");
     if (LABELS[slug]) return LABELS[slug];
@@ -220,6 +229,16 @@
   Vx.initShell = function (opts) {
     opts = opts || {};
     var active = opts.active || "";
+
+    // Members only: no guest access
+    if (!TOKEN) { window.location.replace("login.html"); return; }
+    // First time here? Finish setup (buyer/artist + art types) before anything else.
+    if (!opts.onboarding) {
+      Vx.loadMe().then(function (me) {
+        if (me === null && !Vx.me) { Vx.logout(); return; }
+        if (me && !me.onboarded) window.location.replace("onboarding.html");
+      });
+    }
     document.body.classList.add("vx");
 
     function navLink(key, href, icon, text) {
@@ -290,11 +309,7 @@
       });
     }
 
-    if (TOKEN) buildLoggedIn();
-    else {
-      right.appendChild(h("a", { class: "vxBtn line sm", href: "login.html" }, "Log in"));
-      right.appendChild(h("a", { class: "vxBtn primary sm", href: "signup.html" }, "Join free"));
-    }
+    buildLoggedIn();
 
     var header = h("header", { class: "vxHeader" }, h("div", { class: "in" },
       h("a", { class: "vxBrand", href: "dashboard.html" }, h("span", { class: "vxMark", text: "V" }), "VOXELLA"),

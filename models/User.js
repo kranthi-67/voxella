@@ -113,6 +113,16 @@ const userSchema = new mongoose.Schema({
         validate: [(list) => list.length <= 5, "You can pick up to 5 specialties."]
     },
 
+    // Art types a user wants to see more of. Used to rank the "For you" feed.
+    interests: {
+        type: [{ type: String, enum: SPECIALTIES }],
+        default: [],
+        validate: [(list) => list.length <= 8, "You can pick up to 8 art types."]
+    },
+
+    // false until the user has finished the first-time setup (account type + art types)
+    onboarded: { type: Boolean, default: false },
+
     commissionsOpen: {
         type: Boolean,
         default: false

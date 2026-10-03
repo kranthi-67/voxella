@@ -245,10 +245,67 @@ const getProfile = async (req, res) => {
 
 };
 
+
+// First-time setup: choose buyer/seller and the art types you care about.
+const completeOnboarding = async (req, res) => {
+    try {
+        const { userType, artTypes } = req.body;
+
+        if (!["buyer", "seller"].includes(userType)) {
+            return res.status(400).json({ success: false, message: "Choose buyer or artist." });
+        }
+
+        const max = userType === "seller" ? 5 : 8;
+        const valid = Array.isArray(artTypes) &&
+            artTypes.length >= 1 &&
+            artTypes.length <= max &&
+            artTypes.every((item) => SPECIALTIES.includes(item));
+
+        if (!valid) {
+            return res.status(400).json({ success: false, message: "Pick between 1 and " + max + " art types." });
+        }
+
+        const user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ success: false, message: "User not found." });
+
+        const unique = [...new Set(artTypes)];
+        const names = unique.slice(0, 3).map((item) => item.replace(/-/g, " "));
+        const nice = names.map((item) => item.charAt(0).toUpperCase() + item.slice(1));
+
+        user.userType = userType;
+        user.interests = unique;
+        if (userType === "seller") user.specialties = unique;
+
+        // Default bio from the chosen art types (only if the user has not written one)
+        if (!user.bio || !user.bio.trim()) {
+            user.bio = userType === "seller"
+                ? nice.join(" · ") + " artist on VOXELLA."
+                : "Looking for " + names.join(", ") + " artists.";
+        }
+
+        user.onboarded = true;
+        await user.save();
+
+        res.json({
+            success: true,
+            user: {
+                userType: user.userType,
+                interests: user.interests,
+                specialties: user.specialties,
+                bio: user.bio,
+                onboarded: true
+            }
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
 module.exports = {
 
     uploadMedia,
     updateProfile,
-    getProfile
-
+    getProfile,
+    completeOnboarding
 };

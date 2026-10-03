@@ -23,7 +23,7 @@
   var token = 0;
   qInput.value = state.q;
 
-  var SPECIALTIES = ["digital-art", "illustration", "character-design", "concept-art", "pixel-art", "logo-design", "graphic-design", "ui-design", "animation", "3d-modeling", "3d-sculpting"];
+  var SPECIALTIES = Vx.ART_TYPES;
 
   function syncUrl() {
     var p = new URLSearchParams();
@@ -68,9 +68,7 @@
 
   function emptyState() {
     var isArt = state.tab === "art";
-    var cta = Vx.token
-      ? (isArt ? h("button", { class: "vxBtn primary", type: "button", text: "Add your artwork", onclick: function () { Vx.openCreate("artwork"); } }) : null)
-      : h("a", { class: "vxBtn primary", href: "signup.html", text: "Join as an artist" });
+    var cta = isArt ? h("button", { class: "vxBtn primary", type: "button", text: "Add your artwork", onclick: function () { Vx.openCreate("artwork"); } }) : null;
     return h("div", { class: "vxCard empty" }, h("div", { class: "ic" }, Vx.icon(isArt ? "image" : "brush")),
       h("h3", { text: isArt ? "No artwork found" : "No artists found" }),
       h("p", { text: state.q || state.category || state.open || state.specialty || state.forSale ? "Try removing a filter or searching for something else." : "Be the first to put your work here." }), cta);
