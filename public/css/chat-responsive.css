@@ -1,0 +1,156 @@
+.chatContainer {
+  height: min(88vh, 900px);
+  height: min(88dvh, 900px);
+  min-height: min(640px, 88dvh);
+}
+
+#messages {
+  min-height: 0;
+  overscroll-behavior: contain;
+}
+
+.contentCol {
+  min-width: 0;
+}
+
+.chatImage {
+  max-height: min(55vh, 520px);
+  object-fit: contain;
+}
+
+.composeFeedback {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 34px;
+  padding: 6px 18px;
+  border-top: 1px solid var(--line);
+  background: var(--vx-panel);
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.composeFeedback[hidden],
+#mediaUploadProgress[hidden] {
+  display: none;
+}
+
+.composeFeedback.error {
+  color: var(--vx-danger);
+}
+
+.composeFeedback.success {
+  color: var(--vx-accent-text);
+}
+
+#mediaUploadProgress {
+  flex: 0 0 96px;
+  width: 96px;
+  height: 8px;
+  accent-color: var(--vx-accent);
+}
+
+.inputArea button:disabled,
+.chatActions button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.mediaError {
+  margin: 6px 0;
+  color: var(--vx-danger);
+  font-size: 12px;
+}
+
+@media (max-height: 720px) and (min-width: 701px) {
+  body {
+    height: 100dvh;
+    min-height: 0;
+    padding: 8px;
+    overflow: hidden;
+  }
+
+  .chatContainer {
+    height: calc(100dvh - 16px);
+    min-height: 0;
+  }
+}
+
+@media (max-width: 700px) {
+  body {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .chatContainer {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    max-height: 100dvh;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .topBar {
+    min-height: calc(68px + env(safe-area-inset-top));
+    padding: env(safe-area-inset-top) 12px 0;
+    flex: 0 0 auto;
+  }
+
+  #status,
+  .typingStatus,
+  .chatActions,
+  .composeFeedback,
+  .inputArea {
+    flex: 0 0 auto;
+  }
+
+  .chatActions {
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .chatActions::-webkit-scrollbar {
+    display: none;
+  }
+
+  .chatActions .secondary {
+    flex: 0 0 auto;
+    min-height: 38px;
+  }
+
+  .chatActions input {
+    flex: 0 0 128px;
+  }
+
+  #messages {
+    padding-bottom: 16px;
+  }
+
+  .inputArea {
+    padding: 10px max(10px, env(safe-area-inset-right)) 10px
+      max(10px, env(safe-area-inset-left));
+  }
+
+  .inputArea input {
+    min-height: 44px;
+    font-size: 16px;
+  }
+
+  .inputArea button {
+    min-width: 68px;
+    min-height: 44px;
+  }
+
+  .composeFeedback {
+    padding-right: max(12px, env(safe-area-inset-right));
+    padding-left: max(12px, env(safe-area-inset-left));
+  }
+
+  .mediaViewer,
+  .gifPicker {
+    max-height: calc(100dvh - 24px - env(safe-area-inset-top));
+  }
+}

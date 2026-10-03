@@ -4,6 +4,10 @@ const status = document.getElementById("status");
 const messages = document.getElementById("messages");
 const input = document.getElementById("messageInput");
 const sendBtn = document.getElementById("sendBtn");
+const sendBtnLabel = document.getElementById("sendBtnLabel");
+const composeFeedback = document.getElementById("composeFeedback");
+const composeFeedbackText = document.getElementById("composeFeedbackText");
+const mediaUploadProgress = document.getElementById("mediaUploadProgress");
 const attachImageBtn = document.getElementById("attachImageBtn");
 const gifBtn = document.getElementById("gifBtn");
 const attachVideoBtn = document.getElementById("attachVideoBtn");
@@ -48,6 +52,9 @@ let callActive = false;
 let pendingCandidates = [];
 let typingTimer = null;
 let typingSent = false;
+let sendingMessage = false;
+let followingMessages = true;
+let gifSearchRequest = null;
 const avatars = new Map();
 const renderedMessages = new Set();
 const DEFAULT_AVATAR = "assets/defaultavatar.png";
@@ -70,9 +77,19 @@ function messageKey(message) {
   return message.messageId || `${message.sender}|${message.type}|${message.mediaUrl || ""}|${message.text || ""}|${message.createdAt || ""}`;
 }
 
+async function readJsonResponse(response) {
+  try {
+    return await response.json();
+  } catch {
+    throw new Error("The server returned an invalid response. Please try again.");
+  }
+}
+
 async function fetchChat(id) {
   const response = await fetch(`/api/chat/${encodeURIComponent(id)}`, { headers: authHeaders });
-  return response.json();
+  const data = await readJsonResponse(response);
+  if (!response.ok || !data.success) throw new Error(data.message || "Unable to load chat.");
+  return data;
 }
 
 async function ensureAvatar(username) {
@@ -105,9 +122,31 @@ function setMediaBusy(isBusy) {
   recordAudioBtn.disabled = isBusy;
 }
 
+function setComposeFeedback(message, state = "", progress = null) {
+  composeFeedbackText.textContent = message;
+  composeFeedback.classList.toggle("error", state === "error");
+  composeFeedback.classList.toggle("success", state === "success");
+  composeFeedback.hidden = !message;
+  mediaUploadProgress.hidden = progress === null;
+  if (progress !== null) mediaUploadProgress.value = progress;
+}
+
+function updateSendState() {
+  sendBtn.disabled = sendingMessage || !input.value.trim() || !activeChatId;
+}
+
 function updateMessageCount() {
   messageCount.textContent = `${input.value.length} / 1000`;
+  updateSendState();
 }
+
+function isNearMessageBottom() {
+  return messages.scrollHeight - messages.scrollTop - messages.clientHeight < 80;
+}
+
+messages.addEventListener("scroll", () => {
+  followingMessages = isNearMessageBottom();
+});
 
 function filterMessages() {
   const query = chatSearch.value.trim().toLowerCase();
@@ -144,38 +183,41 @@ async function sendGif(mediaUrl) {
   appendMessage(data.message); socket.emit("sendMessage", { roomId: roomName, message: data.message }); gifPicker.close();
 }
 
-async function searchGifs(query) {
-  gifResults.replaceChildren(); gifStatus.textContent = "Searching GIPHY…";
-  const data = await fetch(`/api/gifs/search?q=${encodeURIComponent(query)}`).then((response) => response.json());
-  if (!data.success) { gifStatus.textContent = data.message || "GIF search is unavailable."; return; }
-  gifStatus.textContent = data.results.length ? "Choose a GIF" : "No GIFs found.";
-  data.results.forEach((gif) => { const button = document.createElement("button"); const image = document.createElement("img"); image.src = gif.preview; image.alt = "GIF result"; button.appendChild(image); button.onclick = async () => { try { await sendGif(gif.url); } catch (error) { alert(error.message); } }; gifResults.appendChild(button); });
-}
-
 async function loadGifs(query) {
+  gifSearchRequest?.abort();
+  const controller = new AbortController();
+  gifSearchRequest = controller;
   gifResults.replaceChildren();
   gifStatus.textContent = query ? "Searching GIFs..." : "Loading popular GIFs...";
   try {
-    const response = await fetch(`/api/gifs/search?q=${encodeURIComponent(query)}`);
+    const response = await fetch(`/api/gifs/search?q=${encodeURIComponent(query)}`, { signal: controller.signal });
     const data = await response.json();
     if (!response.ok || !data.success) throw new Error(data.message || "GIF search is unavailable.");
+    if (gifSearchRequest !== controller) return;
     gifStatus.textContent = data.results.length ? "Pick one to send" : "No GIFs found. Try another search.";
     data.results.forEach((gif) => {
       const button = document.createElement("button");
       const image = document.createElement("img");
-      image.src = gif.preview; image.alt = "GIF result"; image.loading = "lazy";
+      image.src = gif.preview || gif.url; image.alt = "GIF result"; image.loading = "lazy";
       image.onerror = () => button.remove();
       button.appendChild(image);
       button.onclick = async () => { button.disabled = true; gifStatus.textContent = "Sending GIF..."; try { await sendGif(gif.url); } catch (error) { gifStatus.textContent = error.message || "GIF could not be sent."; button.disabled = false; } };
       gifResults.appendChild(button);
     });
-  } catch (error) { gifStatus.textContent = error.message || "GIF search is unavailable."; }
+  } catch (error) {
+    if (error.name !== "AbortError" && gifSearchRequest === controller) {
+      gifStatus.textContent = error.message || "GIF search is unavailable.";
+    }
+  } finally {
+    if (gifSearchRequest === controller) gifSearchRequest = null;
+  }
 }
 
 function appendMessage(payload) {
   const key = messageKey(payload);
   if (renderedMessages.has(key)) return;
   renderedMessages.add(key);
+  const shouldFollow = followingMessages || isNearMessageBottom();
 
   const row = document.createElement("article");
   row.dataset.messageId = payload.messageId || "";
@@ -201,6 +243,11 @@ function appendMessage(payload) {
     image.src = mediaUrl;
     image.alt = "Shared image";
     image.className = "chatImage";
+    image.loading = "lazy";
+    image.decoding = "async";
+    image.addEventListener("load", () => {
+      if (followingMessages) messages.scrollTop = messages.scrollHeight;
+    });
     image.onclick = () => { viewerImage.src = mediaUrl; mediaViewer.showModal(); };
     image.onerror = () => { image.replaceWith(Object.assign(document.createElement("p"), { className: "mediaError", textContent: "This image is no longer available." })); };
     content.appendChild(image);
@@ -315,7 +362,10 @@ function appendMessage(payload) {
   row.appendChild(content);
   messages.appendChild(row);
   if (kind !== "system") updateReactionView(payload.messageId, payload.reactions || []);
-  messages.scrollTop = messages.scrollHeight;
+  if (shouldFollow) {
+    messages.scrollTop = messages.scrollHeight;
+    followingMessages = true;
+  }
 }
 
 function addSystemMessage(text) {
@@ -370,6 +420,7 @@ async function joinRoom() {
       activeChatId = data.chatId;
       roomName = data.chatId;
       status.textContent = data.waiting ? "Waiting for a match..." : "Match found!";
+      updateSendState();
     }
     await loadChatInfo(activeChatId, true);
     socket.emit("joinRoom", { roomId: roomName });
@@ -379,14 +430,37 @@ async function joinRoom() {
   }
 }
 
-async function uploadChatMedia(file, messageType) {
+async function uploadChatMedia(file, messageType, onProgress = () => {}) {
   const formData = new FormData();
   formData.append("chatId", activeChatId);
   formData.append("messageType", messageType);
   formData.append("type", "chat");
   formData.append("file", file, file.name || (messageType === "voice" ? "voice-note.webm" : "image"));
-  const response = await fetch("/api/chat/upload", { method: "POST", headers: { Authorization: `Bearer ${token}` }, body: formData });
-  return response.json();
+  return new Promise((resolve, reject) => {
+    const request = new XMLHttpRequest();
+    request.open("POST", "/api/chat/upload");
+    request.setRequestHeader("Authorization", `Bearer ${token}`);
+    request.upload.addEventListener("progress", (event) => {
+      if (event.lengthComputable) onProgress(Math.round((event.loaded / event.total) * 100));
+    });
+    request.addEventListener("load", () => {
+      let result;
+      try {
+        result = JSON.parse(request.responseText);
+      } catch {
+        reject(new Error("The upload server returned an invalid response."));
+        return;
+      }
+      if (request.status < 200 || request.status >= 300 || !result.success) {
+        reject(new Error(result.message || "Upload failed."));
+        return;
+      }
+      resolve(result);
+    });
+    request.addEventListener("error", () => reject(new Error("Network error while uploading. Check your connection and try again.")));
+    request.addEventListener("abort", () => reject(new Error("Upload was cancelled.")));
+    request.send(formData);
+  });
 }
 
 function createPeerConnection() {
@@ -484,18 +558,32 @@ socket.on("callIce", async ({ candidate }) => { if (!peerConnection?.remoteDescr
 socket.on("callEnd", () => endCall(false));
 
 sendBtn.addEventListener("click", async () => {
+  if (sendingMessage) return;
+  const submittedValue = input.value;
   const text = input.value.trim();
   if (!text || !activeChatId) return;
+  sendingMessage = true;
   sendBtn.disabled = true;
-  input.disabled = true;
+  sendBtnLabel.textContent = "Sending…";
+  setComposeFeedback("Sending message…");
   try {
-    const result = await fetch(`/api/chat/${encodeURIComponent(activeChatId)}/message`, { method: "POST", headers: authHeaders, body: JSON.stringify({ text, type: "text" }) }).then((response) => response.json());
-    if (!result.success) throw new Error(result.message || "Message not sent.");
+    const response = await fetch(`/api/chat/${encodeURIComponent(activeChatId)}/message`, { method: "POST", headers: authHeaders, body: JSON.stringify({ text, type: "text" }) });
+    const result = await readJsonResponse(response);
+    if (!response.ok || !result.success) throw new Error(result.message || "Message not sent.");
     appendMessage(result.message);
     socket.emit("sendMessage", { roomId: roomName, message: result.message });
-    input.value = "";
-    updateMessageCount();
-  } catch (error) { alert(error.message); } finally { sendBtn.disabled = false; input.disabled = false; input.focus(); }
+    if (input.value === submittedValue) {
+      input.value = "";
+      updateMessageCount();
+    }
+    setComposeFeedback("Message sent.", "success");
+  } catch (error) {
+    setComposeFeedback(error.message || "Message not sent. Please try again.", "error");
+  } finally {
+    sendingMessage = false;
+    sendBtnLabel.textContent = "Send";
+    updateSendState();
+  }
 });
 
 attachImageBtn.addEventListener("click", () => imageInput.click());
@@ -506,25 +594,55 @@ imageInput.addEventListener("change", async () => {
   imageInput.value = "";
   if (!file || !activeChatId) return;
   if (!/^image\/(png|jpeg|gif|webp)$/.test(file.type)) {
-    return alert("Choose a PNG, JPG, WEBP, or GIF image.");
+    setComposeFeedback("Choose a PNG, JPG, WEBP, or GIF image.", "error");
+    return;
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    setComposeFeedback("Images must be 10 MB or smaller.", "error");
+    return;
   }
   try {
     setMediaBusy(true);
-    status.textContent = "Uploading image…";
-    const result = await uploadChatMedia(file, "image");
-    if (!result.success) throw new Error(result.message || "Image upload failed.");
+    setComposeFeedback(`Uploading ${file.name}…`, "", 0);
+    const result = await uploadChatMedia(file, "image", (progress) => {
+      setComposeFeedback(`Uploading ${file.name}… ${progress}%`, "", progress);
+    });
     appendMessage(result.message);
     socket.emit("sendMessage", { roomId: roomName, message: result.message });
-    status.textContent = "Image sent";
-  } catch (error) { alert(error.message); } finally { setMediaBusy(false); }
+    setComposeFeedback("Image sent.", "success");
+  } catch (error) {
+    setComposeFeedback(error.message || "Image upload failed. Please try again.", "error");
+  } finally {
+    setMediaBusy(false);
+  }
 });
 socket.on("messageReaction", ({ messageId, reactions }) => updateReactionView(messageId, reactions));
 
 videoInput.addEventListener("change", async () => {
   const file = videoInput.files[0]; videoInput.value = "";
   if (!file || !activeChatId) return;
-  if (!/^video\/(mp4|webm)$/.test(file.type)) return alert("Choose an MP4 or WEBM video.");
-  try { setMediaBusy(true); status.textContent = "Uploading video…"; const result = await uploadChatMedia(file, "video"); if (!result.success) throw new Error(result.message || "Video upload failed."); appendMessage(result.message); socket.emit("sendMessage", { roomId: roomName, message: result.message }); status.textContent = "Video sent"; } catch (error) { alert(error.message); } finally { setMediaBusy(false); }
+  if (!/^video\/(mp4|webm)$/.test(file.type)) {
+    setComposeFeedback("Choose an MP4 or WEBM video.", "error");
+    return;
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    setComposeFeedback("Videos must be 10 MB or smaller.", "error");
+    return;
+  }
+  try {
+    setMediaBusy(true);
+    setComposeFeedback(`Uploading ${file.name}…`, "", 0);
+    const result = await uploadChatMedia(file, "video", (progress) => {
+      setComposeFeedback(`Uploading ${file.name}… ${progress}%`, "", progress);
+    });
+    appendMessage(result.message);
+    socket.emit("sendMessage", { roomId: roomName, message: result.message });
+    setComposeFeedback("Video sent.", "success");
+  } catch (error) {
+    setComposeFeedback(error.message || "Video upload failed. Please try again.", "error");
+  } finally {
+    setMediaBusy(false);
+  }
 });
 
 recordAudioBtn.addEventListener("click", async () => {

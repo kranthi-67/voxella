@@ -10,6 +10,7 @@
 
 <link rel="stylesheet" href="css/tokens.css"><script src="js/appearance.js"></script>
 <link rel="stylesheet" href="css/chat.css">
+<link rel="stylesheet" href="css/chat-responsive.css">
 
 </head>
 
@@ -49,20 +50,23 @@
 
     <div id="messages"></div>
 
-    <div class="inputArea">
+    <div id="composeFeedback" class="composeFeedback" role="status" aria-live="polite" aria-atomic="true" hidden>
+        <span id="composeFeedbackText"></span>
+        <progress id="mediaUploadProgress" max="100" value="0" hidden></progress>
+    </div>
 
+    <div class="inputArea">
         <input
             id="messageInput"
             type="text"
             maxlength="1000"
+            aria-label="Write a message"
             placeholder="Write a message...">
 
         <span id="messageCount" class="messageCount">0 / 1000</span>
 
-        <button id="sendBtn">
-
-            Send <span aria-hidden="true">↑</span>
-
+        <button id="sendBtn" type="button">
+            <span id="sendBtnLabel">Send</span> <span aria-hidden="true">↑</span>
         </button>
 
     </div>

@@ -68,7 +68,7 @@ app.use((error, req, res, next) => {
         return res.status(error.code === "LIMIT_FILE_SIZE" ? 413 : 400).json({
             success: false,
             message: error.code === "LIMIT_FILE_SIZE"
-                ? "That file is too large. Photos can be up to 10 MB and videos up to 40 MB."
+                ? "That file is too large. Uploads can be up to 10 MB."
                 : isCloudinaryAuthError
                     ? "Image hosting rejected this upload. In Render, replace the Cloudinary credentials with the current values from your Cloudinary dashboard, then redeploy."
                     : (error.message || "Request could not be completed.")
