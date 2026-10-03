@@ -22,3 +22,7 @@ body{display:block;padding:0;min-height:100vh}
   #profileCard{position:static;max-width:540px;margin-inline:auto}
 }
 @media(max-width:520px){.pmStats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){
+  #backgroundLayer{inset:150px 0 auto;height:260px}
+  #profileCard .pmStats{margin:18px 0}
+}

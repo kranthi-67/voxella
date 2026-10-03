@@ -34,11 +34,12 @@
       seller ? h("span", { class: "vxBadge", text: "Artist" }) : h("span", { class: "vxTag", text: "Buyer" }),
       seller && user.commissionsOpen ? h("span", { class: "vxBadge ok", text: "Open for commissions" }) : null);
     summary.appendChild(top);
-    summary.appendChild(h("div", { class: "pmStats" },
+    var stats = h("div", { class: "pmStats" },
       h("div", { class: "pmStat" }, h("b", { text: user.ratingCount ? Number(user.ratingAverage).toFixed(1) + " ★" : "New" }), h("span", { text: user.ratingCount ? user.ratingCount + " reviews" : "No reviews yet" })),
       h("div", { class: "pmStat" }, h("b", { id: "pmWorks", text: "-" }), h("span", { text: "Works" })),
       h("div", { class: "pmStat" }, h("b", { text: String(user.xp || 0) }), h("span", { text: "XP" })),
-      h("div", { class: "pmStat" }, h("b", { text: String((user.trophies || []).length) }), h("span", { text: "Trophies" }))));
+      h("div", { class: "pmStat" }, h("b", { text: String((user.trophies || []).length) }), h("span", { text: "Trophies" })));
+    summary.appendChild(stats);
     if ((user.specialties || []).length) {
       summary.appendChild(h("div", { class: "chipRow" }, user.specialties.map(function (s) { return h("span", { class: "vxTag", text: Vx.label(s) }); })));
     }
@@ -48,6 +49,18 @@
         seller ? h("button", { class: "vxBtn primary sm", type: "button", onclick: function () { Vx.openCreate("artwork"); } }, Vx.icon("plus"), "Add artwork") : null,
         h("button", { class: "vxBtn line sm", type: "button", onclick: function () { Vx.openCreate("post"); } }, Vx.icon("image"), "New post")));
     }
+    var mobileLayout = window.matchMedia("(max-width: 520px)");
+    var profileContent = document.querySelector(".profileContent");
+    var profileActions = document.getElementById("profileActions");
+    function placeStats() {
+      if (mobileLayout.matches && profileContent && profileActions) {
+        profileContent.insertBefore(stats, profileActions);
+      } else {
+        summary.insertBefore(stats, summary.children[1] || null);
+      }
+    }
+    placeStats();
+    mobileLayout.addEventListener("change", placeStats);
     main.appendChild(summary);
 
     var tabs = h("div", { class: "tabs pmTabs" });
