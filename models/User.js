@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { SPECIALTIES } = require("../config/marketplace");
 
 const userSchema = new mongoose.Schema({
 
@@ -50,14 +51,14 @@ const userSchema = new mongoose.Schema({
 
     theme: {
         type: String,
-        default: "Crimson"
+        default: "Studio"
     },
     aura: { type: String, default: "Crimson" },
 
     bio: {
         type: String,
         default: "",
-        maxlength: 150
+        maxlength: 500
     },
 
     pronouns: {
@@ -89,6 +90,50 @@ const userSchema = new mongoose.Schema({
         type: Date,
         default: null
     },
+
+    // ===== Marketplace fields =====
+
+    // "buyer" or "seller". This is NOT the admin role (see `role` below).
+    userType: {
+        type: String,
+        enum: ["buyer", "seller"],
+        default: "buyer"
+    },
+
+    tagline: {
+        type: String,
+        default: "",
+        trim: true,
+        maxlength: 80
+    },
+
+    specialties: {
+        type: [{ type: String, enum: SPECIALTIES }],
+        default: [],
+        validate: [(list) => list.length <= 5, "You can pick up to 5 specialties."]
+    },
+
+    commissionsOpen: {
+        type: Boolean,
+        default: false
+    },
+
+    // The fields below are changed ONLY by the server, never by a request from the browser.
+    xp: { type: Number, default: 0, min: 0 },
+
+    trophies: {
+        type: [{
+            key: { type: String, required: true },
+            earnedAt: { type: Date, default: Date.now },
+            _id: false
+        }],
+        default: []
+    },
+
+    ratingAverage: { type: Number, default: 0, min: 0, max: 5 },
+    ratingCount: { type: Number, default: 0, min: 0 },
+
+    // ===== End marketplace fields =====
 
     friends: {
         type: [String],

@@ -1,133 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Create Account • VOXELLA</title>
-
-    <link rel="stylesheet" href="css/signup.css">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create account | VOXELLA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<script src="js/appearance.js"></script>
+<link rel="stylesheet" href="css/auth.css">
 </head>
-
 <body>
-
-<div class="backgroundGlow"></div>
-
-<div class="signupCard">
-
-    <img src="assets/logo.png" class="logo">
-
-    <h1>Create Account</h1>
-
-    <p class="subtitle">
-        Meet new people, make friends and build communities.<br>
-        Your conversations stay private, your identity stays yours.
-    </p>
-
-    <form id="signupForm">
-
-        <label>Display Name</label>
-
-        <input
-            type="text"
-            id="displayName"
-            placeholder="NightWolf"
-            required>
-
-        <!-- NEW EMAIL FIELD -->
-
-        <label>Email Address</label>
-
-        <input
-            type="email"
-            id="email"
-            placeholder="nightwolf@example.com"
-            required>
-
-        <label>Username</label>
-
-        <input
-            type="text"
-            id="username"
-            placeholder="nightwolf"
-            required>
-
-        <div class="previewCard">
-
-            <img src="assets/logo.png" class="previewLogo">
-
-            <h3 id="previewDisplayName">
-                Display Name
-            </h3>
-
-            <p id="usernamePreview">
-                @username
-            </p>
-
-        </div>
-
-        <label>Password</label>
-
-        <div class="passwordBox">
-
-            <input
-                type="password"
-                id="password"
-                placeholder="Create a password"
-                required>
-
-            <span id="togglePassword">👁</span>
-
-        </div>
-
-        <label>Confirm Password</label>
-
-        <div class="passwordBox">
-
-            <input
-                type="password"
-                id="confirmPassword"
-                placeholder="Confirm password"
-                required>
-
-            <span id="toggleConfirm">👁</span>
-
-        </div>
-
-        <div id="error"></div>
-
-        <button type="submit">
-
-            Create Account
-
-        </button>
-
-    </form>
-
-    <div class="loginLink">
-
-        Already have an account?
-
-        <a href="login.html">
-
-            Login
-
-        </a>
-
+<div class="authShell">
+  <aside class="authArt">
+    <a class="brand" href="index.html"><span class="brandMark">V</span>VOXELLA</a>
+    <div class="artCopy">
+      <h2>Your work deserves a better home.</h2>
+      <p>Create a profile that looks like you, and let the right people find it.</p>
+      <div class="mosaic" aria-hidden="true"><b></b><b></b><b></b><b></b><b></b><b></b></div>
     </div>
-
+    <span></span>
+  </aside>
+  <main class="authPanel">
+    <button class="themeBtn" type="button" id="themeBtn" aria-label="Switch between dark and cream mode">◐</button>
+    <div class="formCard signupCard">
+      <h1>Create your account</h1>
+      <p class="sub">It takes a minute. You can customize your profile after.</p>
+      <form id="signupForm">
+        <label for="displayName">Display name</label>
+        <input type="text" id="displayName" placeholder="Mira Sol" required>
+        <label for="email">Email address</label>
+        <input type="email" id="email" placeholder="mira@example.com" required>
+        <label for="username">Username</label>
+        <input type="text" id="username" placeholder="mirasol" required>
+        <div class="previewCard">
+          <div class="previewMark">V</div>
+          <div><h3 id="previewDisplayName">Display Name</h3><p id="usernamePreview">@username</p></div>
+        </div>
+        <label for="password">Password</label>
+        <div class="passwordBox"><input type="password" id="password" placeholder="Create a password" required><span id="togglePassword">👁</span></div>
+        <label for="confirmPassword">Confirm password</label>
+        <div class="passwordBox"><input type="password" id="confirmPassword" placeholder="Confirm password" required><span id="toggleConfirm">👁</span></div>
+        <div id="error"></div>
+        <button type="submit">Create account</button>
+      </form>
+      <div class="loginLink">Already have an account? <a href="login.html">Log in</a></div>
+    </div>
+  </main>
 </div>
-
 <script src="js/signup.js"></script>
-
+<script>document.getElementById("themeBtn").onclick=function(){setAppearance(document.documentElement.dataset.appearance==="white"?"dark":"white")}</script>
 </body>
-
 </html>

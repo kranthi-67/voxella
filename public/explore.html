@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Explore | VOXELLA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css"><script src="js/appearance.js"></script><link rel="stylesheet" href="css/market.css">
+</head>
+<body>
+<main class="vxPage"><div class="vxWrap">
+  <section class="exploreHero">
+    <p class="vxEyebrow">Explore</p>
+    <h1 class="vxH1">Find your next favorite artist.</h1>
+    <p class="lead">Browse artwork, discover illustrators, designers and 3D modellers, and message them directly.</p>
+    <form class="bigSearch" id="bigSearch" role="search"><span id="bigSearchIcon"></span><input id="q" type="search" placeholder="Search by title, tag or artist name" autocomplete="off" aria-label="Search"></form>
+    <div class="tabs" role="tablist"><button id="tabArt" type="button" role="tab">Artwork</button><button id="tabArtists" type="button" role="tab">Artists</button></div>
+  </section>
+  <div class="filters" id="filters"></div>
+  <div id="results"></div>
+  <div class="loadMore"><button id="more" class="vxBtn line" type="button" hidden>Load more</button></div>
+</div></main>
+<script src="js/shell.js"></script><script src="js/cards.js"></script><script src="js/compose.js"></script><script src="js/explore.js"></script>
+</body></html>

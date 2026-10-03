@@ -179,6 +179,7 @@
     if (user.theme) {
       var themeName = user.theme.trim().toLowerCase();
       var validThemes = [
+        "studio",
         "crimson",
         "galaxy",
         "ocean",
@@ -203,9 +204,9 @@
         "prism", "neon arena", "phantom", "kawaii", "shonen", "mecha"
       ];
       if (validThemes.includes(themeName)) {
-        els.backgroundLayer.classList.add("theme-" + themeName);
+        els.backgroundLayer.classList.add("theme-" + themeName.replace(/\s+/g, "-"));
       } else {
-        els.backgroundLayer.classList.add("theme-crimson");
+        els.backgroundLayer.classList.add("theme-studio");
       }
     }
 
@@ -253,7 +254,7 @@
     els.inputStatus.value = user.status || "Online";
     els.inputStatusNote.value = statusUtils.getStatusNoteText(user.statusNote, user.statusNoteExpiresAt);
     els.inputStatusNoteDuration.value = "24h";
-    els.inputTheme.value = user.theme || "Crimson";
+    els.inputTheme.value = user.theme || "Studio";
     els.inputAura.value = user.aura || "Crimson";
     renderThemeGallery();
     els.inputAppearance.value = localStorage.getItem("appearance") || "dark";
@@ -277,7 +278,7 @@
     names.forEach(function (name) {
       var button = document.createElement("button");
       button.type = "button";
-      button.className = "themeChoice theme-" + name.toLowerCase();
+      button.className = "themeChoice theme-" + name.toLowerCase().replace(/\s+/g, "-");
       button.textContent = name;
       button.classList.toggle("selected", name === els.inputTheme.value);
       button.onclick = function () {

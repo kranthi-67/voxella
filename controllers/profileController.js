@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const { SPECIALTIES } = require("../config/marketplace");
 
 // =====================================
 // Upload Avatar / Banner / Background
@@ -97,7 +98,11 @@ const updateProfile = async (req, res) => {
             statusNoteDuration,
             avatar,
             banner,
-            profileBackground
+            profileBackground,
+            userType,
+            tagline,
+            specialties,
+            commissionsOpen
 
         } = req.body;
 
@@ -124,6 +129,33 @@ const updateProfile = async (req, res) => {
             }
             user.displayName = cleanName;
         }
+        if (userType !== undefined) {
+            if (!["buyer", "seller"].includes(userType)) {
+                return res.status(400).json({ success: false, message: "Account type must be buyer or seller." });
+            }
+            user.userType = userType;
+        }
+
+        if (tagline !== undefined) {
+            const cleanTagline = String(tagline).trim();
+            if (cleanTagline.length > 80) {
+                return res.status(400).json({ success: false, message: "Tagline must be 80 characters or fewer." });
+            }
+            user.tagline = cleanTagline;
+        }
+
+        if (specialties !== undefined) {
+            const validList = Array.isArray(specialties) &&
+                specialties.length <= 5 &&
+                specialties.every((item) => SPECIALTIES.includes(item));
+            if (!validList) {
+                return res.status(400).json({ success: false, message: "Choose up to 5 valid specialties." });
+            }
+            user.specialties = [...new Set(specialties)];
+        }
+
+        if (commissionsOpen !== undefined) user.commissionsOpen = commissionsOpen === true;
+
         if (bio !== undefined) user.bio = bio;
         if (pronouns !== undefined) user.pronouns = pronouns;
         if (theme !== undefined) user.theme = theme;
@@ -184,7 +216,7 @@ const getProfile = async (req, res) => {
         const { username } = req.params;
 
         const user = await User.findOne({ username })
-            .select("displayName username avatar banner profileBackground theme aura bio pronouns status statusNote statusNoteExpiresAt createdAt");
+            .select("displayName username avatar banner profileBackground theme aura bio pronouns status statusNote statusNoteExpiresAt createdAt userType tagline specialties commissionsOpen xp trophies ratingAverage ratingCount");
 
         if (!user) {
 

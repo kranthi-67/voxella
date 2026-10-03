@@ -292,7 +292,7 @@ window.addEventListener("load", async () => {
 
         document.getElementById("pronouns").value = user.pronouns || "";
 
-        document.getElementById("theme").value = user.theme || "Crimson";
+        document.getElementById("theme").value = user.theme || "Studio";
 
         document.getElementById("status").value = user.status || "Online";
 

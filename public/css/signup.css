@@ -11,9 +11,9 @@
 
 body{
 
-    background:#0f0f10;
+    background:var(--vx-bg-rail);
 
-    color:white;
+    color:var(--vx-ink);
 
     min-height:100vh;
 
@@ -45,7 +45,7 @@ body{
 
     height:650px;
 
-    background:radial-gradient(circle,#b11d1d33 0%,transparent 70%);
+    background:radial-gradient(circle,color-mix(in srgb, var(--vx-accent-deep) 20%, transparent) 0%,transparent 70%);
 
     filter:blur(70px);
 
@@ -77,9 +77,9 @@ body{
 
     max-width:92%;
 
-    background:#191919;
+    background:var(--vx-panel);
 
-    border:1px solid #2d2d2d;
+    border:1px solid var(--vx-panel-3);
 
     border-radius:24px;
 
@@ -145,7 +145,7 @@ h1{
 
     text-align:center;
 
-    color:#aaaaaa;
+    color:var(--vx-ink-2);
 
     margin-top:8px;
 
@@ -177,11 +177,11 @@ input{
 
     border-radius:14px;
 
-    border:1px solid #303030;
+    border:1px solid var(--vx-panel-3);
 
-    background:#232323;
+    background:var(--vx-panel-2);
 
-    color:white;
+    color:var(--vx-ink);
 
     font-size:15px;
 
@@ -193,9 +193,9 @@ input:focus{
 
     outline:none;
 
-    border-color:#d92d2d;
+    border-color:var(--vx-accent);
 
-    box-shadow:0 0 12px rgba(217,45,45,.35);
+    box-shadow:0 0 12px color-mix(in srgb, var(--vx-accent) 35%, transparent);
 
 }
 
@@ -207,7 +207,7 @@ input:focus{
 
     margin-top:8px;
 
-    color:#8f8f8f;
+    color:var(--vx-ink-2);
 
     font-size:13px;
 
@@ -225,9 +225,9 @@ input:focus{
 
     border-radius:12px;
 
-    background:#511818;
+    background:var(--vx-accent-wash);
 
-    color:#ffdcdc;
+    color:var(--vx-accent-text);
 
     text-align:center;
 
@@ -247,9 +247,9 @@ button{
 
     border-radius:16px;
 
-    background:linear-gradient(90deg,#9d1c1c,#d92d2d);
+    background:linear-gradient(90deg,var(--vx-accent-deep),var(--vx-accent));
 
-    color:white;
+    color:var(--vx-accent-ink);
 
     font-size:16px;
 
@@ -265,7 +265,7 @@ button:hover{
 
     transform:translateY(-2px);
 
-    box-shadow:0 12px 25px rgba(217,45,45,.35);
+    box-shadow:0 12px 25px color-mix(in srgb, var(--vx-accent) 35%, transparent);
 
 }
 
@@ -277,13 +277,13 @@ button:hover{
 
     text-align:center;
 
-    color:#b3b3b3;
+    color:var(--vx-ink-2);
 
 }
 
 .loginLink a{
 
-    color:#ff5555;
+    color:var(--vx-accent-text);
 
     text-decoration:none;
 
@@ -371,9 +371,9 @@ h1{
 
     margin-top:18px;
 
-    background:#232323;
+    background:var(--vx-panel-2);
 
-    border:1px solid #303030;
+    border:1px solid var(--vx-panel-3);
 
     border-radius:18px;
 
@@ -387,7 +387,7 @@ h1{
 
 .previewCard:hover{
 
-    border-color:#d92d2d;
+    border-color:var(--vx-accent);
 
     transform:translateY(-2px);
 
@@ -411,7 +411,7 @@ h1{
 
 .previewCard p{
 
-    color:#ff5555;
+    color:var(--vx-accent-text);
 
     font-weight:600;
 

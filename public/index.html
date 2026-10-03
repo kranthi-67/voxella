@@ -1,62 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VOXELLA • Build Communities. Chat Freely.</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VOXELLA | Where artists get found and commissioned</title>
+<meta name="description" content="A home for illustrators, designers and 3D modellers: a customizable portfolio profile, direct messages, and commissions you can trust.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<script src="js/appearance.js"></script>
+<link rel="stylesheet" href="css/landing.css">
 </head>
-
 <body>
+<header class="nav"><div class="wrap">
+  <a class="brand" href="index.html"><span class="brandMark">V</span>VOXELLA</a>
+  <nav aria-label="Main"><a href="explore.html">Explore</a><a href="#features">Features</a><a href="#join">Join</a></nav>
+  <div class="navRight">
+    <button class="iconBtn" id="themeToggle" type="button" aria-label="Switch between dark and cream mode">◐</button>
+    <a class="btn line" href="login.html">Log in</a>
+    <a class="btn solid" href="signup.html">Create account</a>
+  </div>
+</div></header>
 
-    <!-- SPLASH -->
-    <div id="splash">
-        <img src="assets/logo.png" class="splashLogo">
-        <h1>VOXELLA</h1>
-        <p id="loadingText">
-            Initializing...
-        </p>
-        <div class="progress">
-            <div id="progressBar"></div>
-        </div>
+<main>
+<section class="hero"><div class="wrap">
+  <div>
+    <span class="eyebrow">For illustrators, designers &amp; 3D modellers</span>
+    <h1>Where artists get <em>found</em> and commissioned.</h1>
+    <p class="lead">Build a profile that looks like you, show your best work, and let buyers reach you directly. Trust is earned through real ratings, not follower counts.</p>
+    <div class="heroCtas">
+      <a class="btn solid big" href="signup.html">Join as an artist</a>
+      <a class="btn line big" href="signup.html">I'm looking for art</a>
     </div>
+    <p class="guest">Just looking? <a href="explore.html">Browse artists as a guest</a></p>
+  </div>
+  <div class="showcase" aria-hidden="true">
+    <div class="tile a"></div><div class="tile b"></div>
+    <article class="sample">
+      <div class="sBanner"></div><span class="sTag">Sample profile</span>
+      <div class="sBody">
+        <div class="sAvatar">M</div>
+        <h3>Mira Sol</h3>
+        <p class="role">Illustrator &middot; Character art</p>
+        <span class="open">Commissions open</span>
+        <div class="sStats"><span><b>4.9 ★</b>128 reviews</span><span><b>Lv 12</b>2,340 XP</span><span><b>8</b>trophies</span></div>
+        <div class="xp"><i></i></div>
+        <div class="works"><b></b><b></b><b></b></div>
+        <span class="btn solid sBtn">Request a commission</span>
+      </div>
+    </article>
+  </div>
+</div></section>
 
-    <!-- LANDING -->
-    <div id="mainContent">
-        <div class="backgroundGlow"></div>
-        
-        <div class="landing">
-            <img src="assets/logo.png" class="logo">
-            <h1>VOXELLA</h1>
-            <p class="tagline">
-                Build Communities. Chat Freely.
-            </p>
-            <p class="description">
-                Meet new people, build friendships and communities in a private and secure environment.
-            </p>
+<section class="block" id="features"><div class="wrap">
+  <div class="sectionHead">
+    <span class="eyebrow">What you get</span>
+    <h2>Everything an artist needs in one place.</h2>
+    <p>A portfolio, an inbox and a reputation, built so serious buyers and honest sellers find each other.</p>
+  </div>
+  <div class="grid4">
+    <article class="card"><div class="cIcon">🎨</div><h3>A profile with personality</h3><p>Banner, avatar and background, with GIFs welcome, plus a theme that fits your style.</p></article>
+    <article class="card"><div class="cIcon">💬</div><h3>Direct messages</h3><p>Talk to buyers and artists privately, with block and report tools built in.</p></article>
+    <article class="card"><span class="soon">Coming soon</span><div class="cIcon">🧾</div><h3>Commissions, tracked</h3><p>Request, accept, deliver and complete, so both sides know where things stand.</p></article>
+    <article class="card"><span class="soon">Coming soon</span><div class="cIcon">🏆</div><h3>Ratings, XP &amp; trophies</h3><p>Only buyers with a completed order can review, so reputation can't be faked.</p></article>
+  </div>
+</div></section>
 
-            <div class="buttons">
-                <!-- Removed the "/" so it looks in the same folder instead of the C: drive root -->
-                <button class="primary" onclick="window.location.href='signup.html'">
-                    Create Account
-                </button>
-                <button class="secondary" onclick="window.location.href='login.html'">
-                    Login
-                </button>
-                <button class="guest" onclick="window.location.href='dashboard.html'">
-                    Continue as Guest
-                </button>
-            </div>
-        </div>
+<section class="block" id="join"><div class="wrap">
+  <div class="split">
+    <article class="roleCard artist"><h3>I'm an artist</h3><p>Show your work, open commissions and grow a reputation people can trust.</p><a class="btn solid" href="signup.html">Create artist profile</a></article>
+    <article class="roleCard"><h3>I'm looking for art</h3><p>Find the right artist, message them directly and commission with confidence.</p><a class="btn line" href="signup.html">Create buyer account</a></article>
+  </div>
+</div></section>
+</main>
 
-        <div class="footer">
-            © 2026 VOXELLA
-        </div>
-    </div>
-
-    <script src="js/app.js"></script>
-
+<footer class="footer"><div class="wrap"><span>&copy; 2026 VOXELLA</span><span>Report anything suspicious. Every report is reviewed by our team.</span></div></footer>
+<script src="js/app.js"></script>
 </body>
 </html>

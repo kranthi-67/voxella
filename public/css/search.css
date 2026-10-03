@@ -9,8 +9,8 @@ font-family:Inter,sans-serif;
 
 body{
 
-background:#0f0f10;
-color:white;
+background:var(--vx-bg-rail);
+color:var(--vx-ink);
 
 display:flex;
 
@@ -24,7 +24,7 @@ height:100vh;
 
 .card{
 
-background:#1b1b1b;
+background:var(--vx-panel);
 
 padding:50px;
 
@@ -46,9 +46,9 @@ height:70px;
 
 border-radius:50%;
 
-border:7px solid #333;
+border:7px solid var(--vx-panel-3);
 
-border-top:7px solid #d92d2d;
+border-top:7px solid var(--vx-accent);
 
 margin:auto;
 
@@ -76,6 +76,6 @@ margin-bottom:15px;
 
 p{
 
-color:#aaaaaa;
+color:var(--vx-ink-2);
 
 }

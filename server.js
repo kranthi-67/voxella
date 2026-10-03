@@ -15,6 +15,9 @@ const friendsRoutes = require("./routes/friends");
 const chatRoutes = require("./routes/chat");
 const adminRoutes = require("./routes/admin");
 const gifRoutes = require("./routes/gifs");
+const artworkRoutes = require("./routes/artworks");
+const postRoutes = require("./routes/posts");
+const artistRoutes = require("./routes/artists");
 
 const app = express();
 const server = http.createServer(app);
@@ -54,6 +57,9 @@ app.use("/api/friends", friendsRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/gifs", gifRoutes);
+app.use("/api/artworks", artworkRoutes);
+app.use("/api/posts", postRoutes);
+app.use("/api/artists", artistRoutes);
 
 app.use((error, req, res, next) => {
     if (error) {
@@ -62,7 +68,7 @@ app.use((error, req, res, next) => {
         return res.status(error.code === "LIMIT_FILE_SIZE" ? 413 : 400).json({
             success: false,
             message: error.code === "LIMIT_FILE_SIZE"
-                ? "Files must be 10 MB or smaller."
+                ? "That file is too large. Photos can be up to 10 MB and videos up to 40 MB."
                 : isCloudinaryAuthError
                     ? "Image hosting rejected this upload. In Render, replace the Cloudinary credentials with the current values from your Cloudinary dashboard, then redeploy."
                     : (error.message || "Request could not be completed.")

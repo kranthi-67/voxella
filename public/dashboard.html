@@ -1,16 +1,26 @@
 <!doctype html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Voxella</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/dashboard.css"></head>
-<body><div class="appShell">
-  <aside class="serverRail" aria-label="Primary navigation"><a class="railBrand" href="dashboard.html">V</a><span class="railRule"></span><a class="railItem active" href="dashboard.html" title="Home">⌂</a><a class="railItem" href="my-chats.html" title="Messages">✦<i id="notificationDot" class="notificationDot" hidden></i></a><a class="railItem" href="friends.html" title="Discover">◎</a><a class="railItem" href="group-search.html" title="Groups">◌</a><span class="railBottom"></span><a class="railItem" href="profile.html" title="Profile">⚙</a></aside>
-  <aside class="sidePanel"><a class="wordmark" href="dashboard.html">VOXELLA</a><button id="randomChat" class="primary sideStart">Start a chat <span>+</span></button><nav class="sectionNav"><p>YOUR SPACE</p><a class="active" href="dashboard.html">⌂ Home</a><a href="my-chats.html">✦ Messages <b id="sideUnread" hidden></b></a><a href="friends.html">◎ Discover</a><p>COMMUNITIES</p><a id="groupChat" href="group-search.html">◌ Find a group</a><a id="groupChats" href="my-chats.html?tab=groups">▦ Your groups</a></nav><a id="profileLink" class="accountDock" href="profile.html"><img id="userAvatar" src="assets/defaultavatar.png" alt=""><span><strong id="displayName">Loading...</strong><small>View profile</small></span><em>⋮</em></a></aside>
-  <main class="mainPanel"><header class="mainHeader"><div><p class="eyebrow">HOME</p><h1>Welcome back.</h1></div><div class="headerActions"><a href="friends.html" class="secondary">Find friends</a><button id="editProfile" class="primary">Edit profile</button></div></header>
-    <section class="hero"><div><p class="eyebrow">MAKE A CONNECTION</p><h2>What do you feel like doing?</h2><p>Start somewhere new or drop back into the people you already know.</p></div><button id="randomChatHero" class="heroButton">Random chat <span>→</span></button></section>
-    <section class="contentGrid"><article class="profileCard" id="profileCard"><div class="profileBanner" id="profileBanner"></div><div class="profileContent"><img id="cardAvatar" class="cardAvatar" src="assets/defaultavatar.png" alt=""><div class="profileCopy"><p class="eyebrow">YOUR PROFILE</p><h2 id="cardDisplayName">Loading...</h2><p id="cardUsername">@loading</p><p id="cardBio">Tell people a little about yourself.</p></div></div></article>
-      <article class="actionCard" id="myChats"><span class="cardIcon">✦</span><div><h2>Messages</h2><p>Continue a conversation.</p></div><span>→</span></article>
-      <article class="actionCard" id="friendsCard"><span class="cardIcon">◎</span><div><h2>Discover</h2><p>Meet people and grow your circle.</p></div><span>→</span></article>
-      <article class="actionCard" id="aboutCard"><span class="cardIcon neutral">i</span><div><h2>About Voxella</h2><p>Privacy, safety, and community info.</p></div><span>→</span></article>
-      <article class="actionCard logout" id="logoutCard"><span class="cardIcon">↗</span><div><h2>Sign out</h2><p>End this session safely.</p></div><span>→</span></article></section>
-  </main></div>
-  <nav class="mobileNav"><a class="active" href="dashboard.html">⌂<small>Home</small></a><a href="my-chats.html">✦<small>Messages</small><i id="shortcutDot" class="notificationDot" hidden></i></a><a href="group-search.html">◌<small>Groups</small></a><a href="profile.html">◎<small>Profile</small></a></nav>
-  <div id="aboutModal" class="aboutModal"><div class="aboutContent"><button id="closeAbout">×</button><p class="eyebrow">VOXELLA</p><h2>A place to be social, your way.</h2><p>Voxella helps people meet, chat, and build small communities. Be kind and keep it real.</p></div></div>
-  <script src="js/appearance.js"></script><script src="js/statusUtils.js"></script><script src="js/dashboard.js"></script></body></html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Feed | VOXELLA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css"><script src="js/appearance.js"></script><link rel="stylesheet" href="css/market.css">
+</head>
+<body>
+<main class="vxPage"><div class="vxWrap feedLayout">
+  <section aria-label="Feed">
+    <div id="composer"></div>
+    <div id="posts"></div>
+    <div class="loadMore"><button id="more" class="vxBtn line" type="button" hidden>Load more</button></div>
+  </section>
+  <aside class="side" aria-label="Discover">
+    <div class="vxCard"><h3>Open for commissions</h3><div id="openArtists"></div><a class="vxBtn soft sm block" href="explore.html?tab=artists&open=1" style="margin-top:10px">See all artists</a></div>
+    <div class="vxCard"><h3>Browse by category</h3><div class="chipRow">
+      <a class="vxChip" href="explore.html?category=drawing">Drawing</a>
+      <a class="vxChip" href="explore.html?category=design">Design</a>
+      <a class="vxChip" href="explore.html?category=3d-model">3D models</a>
+      <a class="vxChip" href="explore.html?forSale=1">For sale</a></div></div>
+    <p class="vxMuted" style="font-size:12.5px;padding:0 6px">Spotted something suspicious? Use Report on a profile. Every report is reviewed.</p>
+  </aside>
+</div></main>
+<script src="js/shell.js"></script><script src="js/cards.js"></script><script src="js/posts-ui.js"></script><script src="js/compose.js"></script><script src="js/feed.js"></script>
+</body></html>

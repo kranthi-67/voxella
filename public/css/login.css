@@ -11,9 +11,9 @@ body{
     justify-content:center;
     align-items:center;
     background:
-        radial-gradient(circle at top left,#ff2b2b33 0%,transparent 35%),
-        radial-gradient(circle at bottom right,#ff000022 0%,transparent 35%),
-        #0b0b0b;
+        radial-gradient(circle at top left,color-mix(in srgb, var(--vx-accent) 20%, transparent) 0%,transparent 35%),
+        radial-gradient(circle at bottom right,color-mix(in srgb, var(--vx-accent) 13%, transparent) 0%,transparent 35%),
+        var(--vx-bg-rail);
     overflow:hidden;
 }
 
@@ -21,8 +21,8 @@ body{
     width:430px;
     padding:45px;
     border-radius:24px;
-    background:#171717;
-    border:1px solid #2d2d2d;
+    background:var(--vx-panel);
+    border:1px solid var(--vx-panel-3);
     box-shadow:0 25px 60px rgba(0,0,0,.6);
     text-align:center;
 }
@@ -33,13 +33,13 @@ body{
 }
 
 .loginCard h1{
-    color:#fff;
+    color:var(--vx-ink);
     font-size:32px;
     margin-bottom:8px;
 }
 
 .loginCard p{
-    color:#9f9f9f;
+    color:var(--vx-ink-2);
     margin-bottom:28px;
 }
 
@@ -48,7 +48,7 @@ body{
     align-items:center;
     gap:9px;
     margin:-4px 0 18px;
-    color:#bdbdbd;
+    color:var(--vx-ink-2);
     font-size:13px;
     text-align:left;
     cursor:pointer;
@@ -58,7 +58,7 @@ body{
     width:auto;
     margin:0;
     padding:0;
-    accent-color:#d92d2d;
+    accent-color:var(--vx-accent);
 }
 
 input{
@@ -66,21 +66,21 @@ input{
     padding:15px 18px;
     margin-bottom:18px;
     border-radius:14px;
-    border:1px solid #2f2f2f;
-    background:#101010;
-    color:white;
+    border:1px solid var(--vx-panel-3);
+    background:var(--vx-bg-rail);
+    color:var(--vx-ink);
     font-size:15px;
     transition:.25s;
 }
 
 input:focus{
     outline:none;
-    border-color:#ff3434;
-    box-shadow:0 0 0 4px rgba(255,52,52,.15);
+    border-color:var(--vx-accent);
+    box-shadow:0 0 0 4px color-mix(in srgb, var(--vx-accent) 15%, transparent);
 }
 
 input::placeholder{
-    color:#6f6f6f;
+    color:var(--vx-ink-3);
 }
 
 button{
@@ -88,8 +88,8 @@ button{
     padding:15px;
     border:none;
     border-radius:14px;
-    background:linear-gradient(90deg,#ff3b3b,#c60000);
-    color:white;
+    background:linear-gradient(90deg,var(--vx-accent),var(--vx-accent-deep));
+    color:var(--vx-accent-ink);
     font-size:16px;
     font-weight:700;
     cursor:pointer;
@@ -98,23 +98,23 @@ button{
 
 button:hover{
     transform:translateY(-2px);
-    box-shadow:0 12px 30px rgba(255,0,0,.35);
+    box-shadow:0 12px 30px color-mix(in srgb, var(--vx-accent) 35%, transparent);
 }
 
 .bottomText{
     margin-top:22px;
-    color:#8c8c8c;
+    color:var(--vx-ink-2);
     font-size:14px;
 }
 
 .bottomText a{
-    color:#ff4b4b;
+    color:var(--vx-accent-text);
     text-decoration:none;
     font-weight:600;
 }
 
 .bottomText a:hover{
-    color:#ff6a6a;
+    color:var(--vx-accent-text);
 }
 .forgotPassword{
     margin-top:15px;
@@ -122,12 +122,12 @@ button:hover{
 }
 
 .forgotPassword a{
-    color:#ff4b4b;
+    color:var(--vx-accent-text);
     text-decoration:none;
     font-size:14px;
     transition:.3s;
 }
 
 .forgotPassword a:hover{
-    color:#ff7b7b;
+    color:var(--vx-accent-text);
 }

@@ -65,6 +65,13 @@ async function loadProfile() {
         cardBio.textContent =
             user.bio || "No bio yet.";
 
+        // Marketplace stats (these values are set by the server only)
+        const setStat = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
+        setStat("statType", user.userType === "seller" ? "Artist" : "Buyer");
+        setStat("statRating", user.ratingCount ? Number(user.ratingAverage || 0).toFixed(1) + " ★" : "None yet");
+        setStat("statXp", String(user.xp || 0));
+        setStat("statTrophies", String((user.trophies || []).length));
+
         if (statusBadge) {
             statusBadge.textContent = statusUtils.getStatusBadgeText(
                 user.status,

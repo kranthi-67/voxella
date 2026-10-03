@@ -1,64 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VOXELLA • Login</title>
-
-    <link rel="stylesheet" href="css/login.css">
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log in | VOXELLA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<script src="js/appearance.js"></script>
+<link rel="stylesheet" href="css/auth.css">
 </head>
-
 <body>
-
-<div class="loginCard">
-
-    <img src="assets/logo.png" class="logo">
-
-    <h1>Welcome Back</h1>
-
-    <p>Login to continue chatting.</p>
-
-    <form id="loginForm">
-
-        <input
-            type="text"
-            id="username"
-            placeholder="Username"
-            required
-        >
-
-        <input
-            type="password"
-            id="password"
-            placeholder="Password"
-            required
-        >
-
-        <label class="rememberLogin">
-            <input type="checkbox" id="rememberMe" checked>
-            Keep me signed in on this device
-        </label>
-
-        <button type="submit">
-            Login
-        </button>
-
-    </form>
-
-    <p class="bottomText">
-        Don't have an account?
-        <a href="signup.html">Create one</a>
-    </p>
-
+<div class="authShell">
+  <aside class="authArt">
+    <a class="brand" href="index.html"><span class="brandMark">V</span>VOXELLA</a>
+    <div class="artCopy">
+      <h2>Good to see you again.</h2>
+      <p>Your portfolio, your messages and your reputation are waiting.</p>
+      <div class="mosaic" aria-hidden="true"><b></b><b></b><b></b><b></b><b></b><b></b></div>
+    </div>
+    <span></span>
+  </aside>
+  <main class="authPanel">
+    <button class="themeBtn" type="button" id="themeBtn" aria-label="Switch between dark and cream mode">◐</button>
+    <div class="formCard loginCard">
+      <h1>Welcome back</h1>
+      <p class="sub">Log in to your VOXELLA account.</p>
+      <form id="loginForm">
+        <label for="username">Username</label>
+        <input type="text" id="username" placeholder="Your username" autocomplete="username" required>
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Your password" autocomplete="current-password" required>
+        <label class="rememberLogin"><input type="checkbox" id="rememberMe" checked> Keep me signed in on this device</label>
+        <button type="submit">Log in</button>
+      </form>
+      <p class="forgotPassword"><a href="forgot-password.html">Forgot password?</a></p>
+      <p class="bottomText">New here? <a href="signup.html">Create an account</a></p>
+    </div>
+  </main>
 </div>
-
 <script src="js/login.js"></script>
-
-<p class="forgotPassword">
-    <a href="forgot-password.html">Forgot Password?</a>
-</p>
+<script>document.getElementById("themeBtn").onclick=function(){setAppearance(document.documentElement.dataset.appearance==="white"?"dark":"white")}</script>
 </body>
 </html>
