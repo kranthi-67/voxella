@@ -34,11 +34,16 @@
       seller ? h("span", { class: "vxBadge", text: "Artist" }) : h("span", { class: "vxTag", text: "Buyer" }),
       seller && user.commissionsOpen ? h("span", { class: "vxBadge ok", text: "Open for commissions" }) : null);
     summary.appendChild(top);
-    var stats = h("div", { class: "pmStats" },
+    var stats = h("div", { class: "pmStats " + (seller ? "pmStatsSeller" : "pmStatsBuyer") },
       h("div", { class: "pmStat" }, h("b", { text: user.ratingCount ? Number(user.ratingAverage).toFixed(1) + " ★" : "New" }), h("span", { text: user.ratingCount ? user.ratingCount + " reviews" : "No reviews yet" })),
       h("div", { class: "pmStat" }, h("b", { id: "pmWorks", text: "-" }), h("span", { text: "Works" })),
       h("div", { class: "pmStat" }, h("b", { text: String(user.xp || 0) }), h("span", { text: "XP" })),
-      h("div", { class: "pmStat" }, h("b", { text: String((user.trophies || []).length) }), h("span", { text: "Trophies" })));
+      seller ? h("div", { class: "pmStat pmTrophyStat" },
+        h("b", { class: "pmTrophyValue" },
+          h("svg", { class: "pmTrophyIcon", viewBox: "0 0 24 24", "aria-hidden": "true", focusable: "false" },
+            h("path", { fill: "currentColor", d: "M7 3h10v3h4v2a5 5 0 0 1-5 5h-.4a6 6 0 0 1-2.6 2.7V19h4v2H7v-2h4v-3.3A6 6 0 0 1 8.4 13H8a5 5 0 0 1-5-5V6h4V3Zm0 5H5a3 3 0 0 0 2.8 3A8 8 0 0 1 7 8Zm12 0h-2a8 8 0 0 1-.8 3A3 3 0 0 0 19 8Z" })),
+          String((user.trophies || []).length)),
+        h("span", null, "Trophies")) : null);
     summary.appendChild(stats);
     if ((user.specialties || []).length) {
       summary.appendChild(h("div", { class: "chipRow" }, user.specialties.map(function (s) { return h("span", { class: "vxTag", text: Vx.label(s) }); })));

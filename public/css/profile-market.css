@@ -6,10 +6,24 @@ body{display:block;padding:0;min-height:100vh}
 .pmSummary{padding:22px;margin-bottom:18px}
 .pmSummary .top{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap}
 .pmTagline{margin:0;font:600 18px/1.35 var(--font-display);flex:1;min-width:200px}
-.pmStats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:18px}
+.pmStats{display:grid;gap:10px;margin-top:18px}
+.pmStatsSeller{grid-template-columns:repeat(4,minmax(0,1fr))}
+.pmStatsBuyer{grid-template-columns:repeat(3,minmax(0,1fr))}
 .pmStat{padding:12px 14px;border-radius:14px;background:var(--vx-bg-side);border:1px solid var(--vx-border-soft)}
 .pmStat b{display:block;font:700 20px var(--font-display)}
 .pmStat span{color:var(--vx-ink-2);font-size:12.5px}
+.pmTrophyStat{background:linear-gradient(145deg,rgba(232,169,74,.12),var(--vx-bg-side) 75%);border-color:rgba(232,169,74,.3)}
+.pmTrophyValue{display:flex!important;align-items:center;gap:7px;color:#f0c27a}
+.pmTrophyIcon{width:20px;height:20px;flex:none;overflow:visible;filter:drop-shadow(0 2px 5px rgba(232,169,74,.35));transform-origin:50% 80%;animation:trophyCelebration 3.4s ease-in-out infinite}
+.pmTrophyStat>span{color:#d9b77e}
+@keyframes trophyCelebration{
+  0%,72%,100%{transform:translateY(0) rotate(0)}
+  78%{transform:translateY(-5px) rotate(-9deg)}
+  83%{transform:translateY(0) rotate(8deg)}
+  88%{transform:translateY(-3px) rotate(-5deg)}
+  93%{transform:translateY(0) rotate(0)}
+}
+@media(prefers-reduced-motion:reduce){.pmTrophyIcon{animation:none}}
 .pmSummary .chipRow{margin-top:14px}
 .pmTabs{margin-bottom:18px}
 .pmGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px}
@@ -21,7 +35,7 @@ body{display:block;padding:0;min-height:100vh}
   .profileLayout{grid-template-columns:1fr;margin-top:18px}
   #profileCard{position:static;max-width:540px;margin-inline:auto}
 }
-@media(max-width:520px){.pmStats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.pmStatsSeller,.pmStatsBuyer{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){
   #backgroundLayer{inset:150px 0 auto;height:260px}
   #profileCard .pmStats{margin:18px 0}
